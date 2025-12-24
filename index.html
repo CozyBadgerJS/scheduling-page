@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scheduling</title>
+    <link rel="stylesheet" href="edit-mode-styles.css" />
+    <link rel="stylesheet" href="view-mode-styles.css" />
+
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="header">
+          <div class="status">
+            <ion-icon name="call-outline"></ion-icon>
+
+            <label for="status-dropdown">Status</label>
+            <select id="status-dropdown" name="selectedOption">
+              <option value="option1">Available</option>
+              <option value="option2">After Call Work</option>
+              <option value="option3">Break</option>
+              <option value="option4">Lunch</option>
+              <option value="option5">Bio</option>
+              <option value="option6">Outbound</option>
+              <option value="option7">Training</option>
+              <option value="option8">Coaching</option>
+              <option value="option9">Offline</option>
+            </select>
+            <span>00:00:00</span>
+          </div>
+          <div class="calling-info">
+            <span class="client-name">Client Name</span>
+            <span class="caller-phone-number">+1 888-888-8888</span>
+            <button class="search-patient-button">Search patient</button>
+            <button class="creater-patient-button">Create New patient</button>
+          </div>
+          <div class="call-time">
+            <ion-icon name="call-outline"></ion-icon>
+            <span>Talking: 01:50</span>
+            <span>Inbound call</span>
+          </div>
+          <div class="call-actions">
+            <button class="hung-up-button">
+              <ion-icon name="call-outline"></ion-icon>
+            </button>
+            <button class="add-call-button">
+              <ion-icon name="person-add-outline"></ion-icon>
+            </button>
+            <button class="hold-button">
+              <ion-icon name="pause-circle-outline"></ion-icon>
+            </button>
+            <button class="transfer-button">
+              <ion-icon name="swap-horizontal-outline"></ion-icon>
+            </button>
+            <button class="mute-button">
+              <ion-icon name="mic-outline"></ion-icon>
+            </button>
+            <button class="dial-button">
+              <ion-icon name="apps-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <>
+    <div class="container">
+      <!-- EDIT MODE -->
+
+      <form class="patient-form">
+        <fieldset class="patient-info">
+          <legend>Patient Information</legend>
+          <div class="pt-info patient-first-name">
+            <label for="patient-first-name">First Name</label>
+            <input id="patient-first-name" type="text" />
+          </div>
+
+          <div class="pt-info patient-last-name">
+            <label for="patient-last-name">Last Name</label>
+            <input id="patient-last-name" type="text" />
+          </div>
+          <div class="pt-info patient-account-id">
+            <label for="patient-account-id">Account ID</label>
+            <input id="patient-account-id" type="text" />
+          </div>
+          <div class="pt-info last-alerts">
+            <label for="patient-alerts">Alerts</label>
+            <input id="patient-alerts" type="text" />
+          </div>
+          <div class="pt-info patient-dob">
+            <label for="patient-dob">Date of Birth</label>
+            <input id="patient-dob" type="date" />
+          </div>
+          <div class="pt-info patient-sex">
+            <label for="patient-sex">Sex</label>
+            <select id="patient-sex" name="selectedOption">
+              <option value="sex-select"></option>
+              <option value="sex-male">Male</option>
+              <option value="sex-female">Female</option>
+            </select>
+          </div>
+          <div class="pt-info patient-height">
+            <label for="patient-height">Height</label>
+            <input id="patient-height" type="text" />
+          </div>
+          <div class="pt-info patient-weight">
+            <label for="patient-weight">Weight</label>
+            <input id="patient-weight" type="text" />
+          </div>
+        </fieldset>
+
+        <fieldset class="patient-contact">
+          <legend>Contact</legend>
+          <div class="pt-info patient-phone">
+            <label for="patient-phone">Primary Phone</label>
+            <input id="patient-phone" type="tel" />
+          </div>
+          <div class="pt-info patient-phone2">
+            <label for="patient-phone2">Secondary Phone</label>
+            <input id="patient-phone2" type="tel" />
+          </div>
+          <div class="pt-info patient-email">
+            <label for="patient-email">Email</label>
+            <input id="patient-email" type="email" />
+          </div>
+        </fieldset>
+
+        <fieldset class="patient-home">
+          <legend>Address</legend>
+          <div class="pt-info patient-address">
+            <label for="patient-address">Address</label>
+            <input id="patient-address" type="text" />
+          </div>
+
+          <div class="pt-info patient-city">
+            <label for="patient-city">City</label>
+            <input id="patient-city" type="text" />
+          </div>
+          <div class="pt-info patient-state">
+            <label for="patient-state">State</label>
+            <input id="patient-state" type="text" />
+          </div>
+          <div class="pt-info patient-zip">
+            <label for="patient-zip">ZIP Code</label>
+            <input id="patient-zip" type="text" />
+          </div>
+        </fieldset>
+      </form>
+      <button class="edit-button">Edit</button>
+      <button class="save-button">Save</button>
+
+      <!-- VIEW MODE -->
+    </div>
+
+    <!-- INSURANCE INFORMATION -->
+
+    <!-- EDIT MODE -->
+
+    <!-- PRIMARY INSURANCE -->
+    <div class="container">
+      <form class="insurance-information">
+        <fieldset>
+          <legend>Primary Insurance</legend>
+          <div class="patient-insurance">
+            <label for="prim-insurance-carrier">Insurance Carrier</label>
+            <select id="prim-insurance-carrier" name="Carrier">
+              <option value="self-pay">Self-Pay</option>
+              <option value="aetna">Aetna</option>
+              <option value="medicare">Medicare</option>
+              <option value="uhc">United Health Care</option>
+            </select>
+
+            <label for="prim-insurance-member-id">Member ID</label>
+            <input id="prim-insurance-member-id" type="text" />
+            <label for="insurance-group-no">Group No.</label>
+            <input id="insurance-group-no" type="text" />
+
+            <label>Relationship</label>
+            <select id="insurance-relationship" name="insurance-relationship">
+              <option value="self">Self</option>
+              <option value="mother">Mother</option>
+              <option value="father">Father</option>
+              <option value="sibling">Sibling</option>
+              <option value="spouse">Spouse</option>
+              <option value="daughter">Daughter</option>
+              <option value="son">Son</option>
+              <option value="other">Other</option>
+            </select>
+
+            <label for="insurance-holder-name">Name</label>
+            <input id="insurance-holder-name" type="text" />
+            <label for="insurace-holder-lastname">Last Name</label>
+            <input id="insurace-holder-lastname" type="text" />
+
+            <label for="insurance-holder-dob">Date of Birth</label>
+            <input id="insurance-holder-dob" type="date" />
+          </div>
+        </fieldset>
+      </form>
+      <button>Edit</button>
+      <button>Save</button>
+    </div>
+    <!-- SECONDARY INSURANCE -->
+    <div class="container">
+      <form class="insurance-information">
+        <fieldset>
+          <legend>Secondary Insurance</legend>
+          <div class="patient-insurance">
+            <label for="sec-insurance-carrier">Insurance Carrier</label>
+            <select id="sec-insurance-carrier" name="Carrier">
+              <option value="self-pay">Self-Pay</option>
+              <option value="aetna">Aetna</option>
+              <option value="medicare">Medicare</option>
+              <option value="uhc">United Health Care</option>
+            </select>
+
+            <label for="sec-insurance-member-id">Member ID</label>
+            <input id="sec-insurance-member-id" type="text" />
+            <label for="insurance-group-no">Group No.</label>
+            <input id="insurance-group-no" type="text" />
+
+            <label>Relationship</label>
+            <select
+              id="secondary-insurance-relationship"
+              name="secondary-insurance-relationship"
+            >
+              <option value="self">Self</option>
+              <option value="mother">Mother</option>
+              <option value="father">Father</option>
+              <option value="sibling">Sibling</option>
+              <option value="spouse">Spouse</option>
+              <option value="daughter">Daughter</option>
+              <option value="son">Son</option>
+              <option value="other">Other</option>
+            </select>
+
+            <label for="insurance-holder-name">Name</label>
+            <input id="insurance-holder-name" type="text" />
+            <label for="insurace-holder-lastname">Last Name</label>
+            <input id="insurace-holder-lastname" type="text" />
+
+            <label for="insurance-holder-dob">Date of Birth</label>
+            <input id="insurance-holder-dob" type="date" />
+          </div>
+        </fieldset>
+      </form>
+      <button>Edit</button>
+      <button>Save</button>
+    </div>
+
+    <!-- TEST -->
+    <main class="scheduler-page">
+      <!-- MAIN GRID -->
+
+      <section class="scheduler-grid">
+        <!-- COLUMN 1: ORDER / EXAM DETAILS -->
+        <aside class="scheduler-column left-column">
+          <div class="accordion">
+            <section class="accordion-section">
+              <button class="accordion-header">Exam Info</button>
+              <div class="accordion-content">
+                <div class="accordion-grid">
+                  <div class="accordion-field">
+                    <label for="exam-name">Exam Name</label>
+                    <!-- view mode -->
+                    <span>Screening Mammogram</span>
+                    <!-- edit mode -->
+                    <input id="exam-name" type="text" />
+                  </div>
+
+                  <div class="accordion-field">
+                    <label for="exam-date">Received on:</label>
+
+                    <!-- view mode -->
+                    <span>1/1/2025</span>
+                    <!-- edit mode -->
+                    <input id="exam-date" type="date" />
+                  </div>
+
+                  <div class="accordion-field">
+                    <label>CPT Code</label>
+                    <span>77067</span>
+                  </div>
+
+                  <div class="accordion-field">
+                    <label>ICD-10</label>
+                    <span>Z12.31</span>
+                  </div>
+
+                  <div class="accordion-field">
+                    <label>Duration</label>
+                    <span>15 minutes</span>
+                  </div>
+
+                  <div class="accordion-field">
+                    <label>Self-Pay price</label>
+                    <span>$230</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="accordion-section">
+              <button class="accordion-header">Preparations</button>
+              <div class="accordion-content">
+                <span>
+                  Do not wear any cream, lotion powder, deodorant, oils or
+                  prerfume on the breast or under the arm area. Wear a 2 piece
+                  outfit.
+                </span>
+              </div>
+            </section>
+
+            <section class="accordion-section">
+              <button class="accordion-header">Alerts</button>
+              <div class="accordion-content">
+                <span
+                  >If patient experiences pain, lumps or discharge on the
+                  breasts, she must have a Diagnostic Mammogram + Breast
+                  Ultrasound. If patient is under 30 years old, only schedule a
+                  Breast Ultrasound.</span
+                >
+              </div>
+            </section>
+
+            <section class="accordion-section">
+              <button class="accordion-header">Referring Physician</button>
+              <div class="accordion-content">
+                <div class="accordion-field">
+                  <label for="ref-physician">Referring Physician</label>
+
+                  <!-- view mode -->
+                  <span>Doctor Culebras</span>
+                  <!-- edit mode -->
+                  <input id="ref-physician" type="text" />
+                </div>
+
+                <div class="accordion-field">
+                  <label for="npi">NPI</label>
+
+                  <!-- view mode -->
+                  <span>198745632</span>
+                  <!-- edit mode -->
+                  <input id="npi" type="text" />
+                </div>
+                <div class="accordion-field">
+                  <label for="physician-office">Address</label>
+
+                  <!-- view mode -->
+                  <span>0110 Sneaky St, Miami, FL, 33101</span>
+                  <!-- edit mode -->
+                  <input id="physician-office" type="text" />
+                </div>
+                <div class="accordion-field">
+                  <label for="physician-phone">Phone</label>
+
+                  <!-- view mode -->
+                  <span>888-888-8888</span>
+                  <!-- edit mode -->
+                  <input
+                    id="physician-phone"
+                    type="tel"
+                    placeholder="888-888-8888"
+                  />
+                </div>
+
+                <div class="accordion-field">
+                  <label for="physician-fax">Fax</label>
+
+                  <!-- view mode -->
+                  <span>888-888-8888</span>
+                  <!-- edit mode -->
+                  <input
+                    id="physician-fax"
+                    type="tel"
+                    placeholder="888-888-9999"
+                  />
+                </div>
+
+                <button>Edit</button><button>Save</button>
+                <button>Add new Physician</button>
+              </div>
+            </section>
+
+            <section class="accordion-section">
+              <button class="accordion-header">Screening Questions</button>
+              <div class="accordion-content">
+                <div class="accordion-field">
+                  <label for="screening-question"
+                    >First time having a mammogram?</label
+                  >
+                  <input id="screening-question" type="text" />
+                </div>
+                <div class="accordion-field">
+                  <label for="screening-question"
+                    >When was your last mammogram?</label
+                  >
+                  <input id="screening-question" type="text" />
+                </div>
+
+                <div class="accordion-field">
+                  <label for="screening-question"
+                    >Where was your last mammogram?</label
+                  >
+                  <input id="screening-question" type="text" />
+                </div>
+                <div class="accordion-field">
+                  <label for="screening-question">Breast implants?</label>
+                  <input id="screening-question" type="text" />
+                </div>
+
+                <div class="accordion-field">
+                  <label for="screening-question"
+                    >Any symptoms of pain, lumps or discharge on breasts?</label
+                  >
+                  <input id="screening-question" type="text" />
+                </div>
+
+                <div class="accordion-field">
+                  <label for="screening-question"
+                    >Any family history of breast cancer?</label
+                  >
+                  <input id="screening-question" type="text" />
+                </div>
+
+                <div class="accordion-field">
+                  <label for="screening-question"
+                    >Any family history of breast cancer?</label
+                  >
+                  <input id="screening-question" type="text" />
+                </div>
+                <button class="save-button">Save</button
+                ><button class="edit-button">Edit</button>
+              </div>
+            </section>
+
+            <section class="accordion-section">
+              <button class="accordion-header">Insurance Info</button>
+              <div class="accordion-content">
+                <div class="accordion-field">
+                  <label for="insurance-select">Primary Insurance</label>
+                  <select id="insurance-select">
+                    <option value=""></option>
+                    <option value="selfpay">Self-Pay</option>
+                    <option value="insurance-on-file">Aetna</option>
+                    <option value="bcbs">Blue Cross Blue Shield</option>
+                    <option value="health-choice">Health Choise</option>
+                    <option value="kaiser">Kaiser</option>
+                    <option value="medicare">Medicare</option>
+                    <option value="medicaid">Medicaid</option>
+                    <option value="oscar">Oscar</option>
+                    <option value="uhc">United Health Care</option>
+                    <option value="veterans">Veterans Administration</option>
+                    <option value="workcomp">Worker's Compensation</option>
+                  </select>
+                </div>
+
+                <div class="accordion-field">
+                  <label for="insurance-relationship">Relationship</label>
+                  <select
+                    id="insurance-relationship"
+                    name="insurance-relationship"
+                  >
+                    <option value="self">Self</option>
+                    <option value="mother">Mother</option>
+                    <option value="father">Father</option>
+                    <option value="sibling">Sibling</option>
+                    <option value="spouse">Spouse</option>
+                    <option value="daughter">Daughter</option>
+                    <option value="son">Son</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div class="accordion-field">
+                  <label for="tab-insurance-holder-name"
+                    >Insurance Holder</label
+                  >
+                  <input
+                    id="tab-insurance-holder-name"
+                    type="text"
+                    placeholder="First Name"
+                  />
+                </div>
+                <div class="accordion-field">
+                  <input
+                    id="tab-insurance-holder-lastname"
+                    type="text"
+                    placeholder="Last Name"
+                  />
+                </div>
+                <div class="accordion-field">
+                  <label for="tab-insurance-holder-dob">DOB</label>
+                  <input id="tab-insurance-holder-dob" type="date" />
+                </div>
+              </div>
+
+              <div class="accordion-content">
+                <div class="accordion-field">
+                  <label for="sec-insurance-select">Secondary Insurance</label>
+                  <select id="sec-insurance-select">
+                    <option value=""></option>
+                    <option value="selfpay">Self-Pay</option>
+                    <option value="insurance-on-file">Aetna</option>
+                    <option value="bcbs">Blue Cross Blue Shield</option>
+                    <option value="health-choice">Health Choise</option>
+                    <option value="kaiser">Kaiser</option>
+                    <option value="medicare">Medicare</option>
+                    <option value="medicaid">Medicaid</option>
+                    <option value="oscar">Oscar</option>
+                    <option value="uhc">United Health Care</option>
+                    <option value="veterans">Veterans Administration</option>
+                    <option value="workcomp">Worker's Compensation</option>
+                  </select>
+                </div>
+
+                <div class="accordion-field">
+                  <label for="insurance-relationship">Relationship</label>
+                  <select
+                    id="insurance-relationship"
+                    name="insurance-relationship"
+                  >
+                    <option value="self">Self</option>
+                    <option value="mother">Mother</option>
+                    <option value="father">Father</option>
+                    <option value="sibling">Sibling</option>
+                    <option value="spouse">Spouse</option>
+                    <option value="daughter">Daughter</option>
+                    <option value="son">Son</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div class="accordion-field">
+                  <label for="tab-sec-insurance-holder-name"
+                    >Insurance Holder</label
+                  >
+                  <input
+                    id="tab-sec-insurance-holder-name"
+                    type="text"
+                    placeholder="First Name"
+                  />
+                </div>
+                <div class="accordion-field">
+                  <input
+                    id="tab-sec-insurance-holder-lastname"
+                    type="text"
+                    placeholder="Last Name"
+                  />
+                </div>
+                <div class="accordion-field">
+                  <label for="tab-sec-insurance-holder-dob">DOB</label>
+                  <input id="tab-sec-insurance-holder-dob" type="date" />
+                </div>
+                <button class="save-button">Save</button>
+                <button class="edit-button">Edit</button>
+              </div>
+            </section>
+
+            <section class="accordion-section">
+              <button class="accordion-header">Uploads</button>
+              <div class="accordion-content">
+                <!-- ORDER (always visible) -->
+                <div class="upload-category">
+                  <div class="upload-header">
+                    <h5>Referring Order</h5>
+                    <label class="upload-btn">
+                      <ion-icon
+                        name="cloud-upload-outline"
+                        class="upload-icon"
+                      ></ion-icon>
+                      <input type="file" hidden multiple />
+                    </label>
+                  </div>
+
+                  <ul class="file-list"></ul>
+                </div>
+
+                <!-- INSURANCE CARD -->
+                <div class="upload-category">
+                  <div class="upload-header">
+                    <h5>Insurance Card</h5>
+                    <label class="upload-btn">
+                      <ion-icon
+                        name="cloud-upload-outline"
+                        class="upload-icon"
+                      ></ion-icon>
+                      <input type="file" hidden multiple />
+                    </label>
+                  </div>
+
+                  <ul class="file-list">
+                    <!-- files will go here -->
+                  </ul>
+                </div>
+
+                <!-- AUTHORIZATION -->
+                <div class="upload-category">
+                  <div class="upload-header">
+                    <h5>Authorization</h5>
+                    <label class="upload-btn">
+                      <ion-icon
+                        name="cloud-upload-outline"
+                        class="upload-icon"
+                      ></ion-icon>
+                      <input type="file" hidden multiple />
+                    </label>
+                  </div>
+
+                  <ul class="file-list"></ul>
+                </div>
+              </div>
+            </section>
+
+            <section class="accordion-section">
+              <button class="accordion-header">Report</button>
+              <div class="accordion-content">
+                <div class="upload-category">
+                  <div class="upload-header">
+                    <h5>Exam Report</h5>
+                    <label class="upload-btn">
+                      <ion-icon
+                        name="cloud-upload-outline"
+                        class="upload-icon"
+                      ></ion-icon>
+                      <input type="file" hidden multiple />
+                    </label>
+                  </div>
+
+                  <ul class="file-list"></ul>
+                </div>
+              </div>
+            </section>
+          </div>
+        </aside>
+
+        <!-- COLUMN 2: SCHEDULING -->
+        <section class="scheduler-column center-column">
+          <div class="scheduler-controls">
+            <div class="control-group">
+              <label for="zip-code">ZIP Code</label>
+              <input id="zip-code" type="text" />
+            </div>
+
+            <div class="control-group">
+              <label for="clinic">Clinic</label>
+              <!-- custom searchable dropdown later -->
+              <input
+                id="clinic"
+                type="text"
+                placeholder="Select or search clinic"
+              />
+            </div>
+
+            <div class="control-group">
+              <label for="room">Room</label>
+              <select id="room">
+                <option value="">Select room</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="calendar-container">
+            <div class="calendar">
+              <div class="calendar-header">
+                <button id="prev-month">
+                  <ion-icon name="chevron-back-outline"></ion-icon>
+                </button>
+                <h3 id="month-label"></h3>
+                <button id="next-month">
+                  <ion-icon name="chevron-forward-outline"></ion-icon>
+                </button>
+              </div>
+
+              <div class="calendar-weekdays">
+                <span>Sun</span>
+                <span>Mon</span>
+                <span>Tue</span>
+                <span>Wed</span>
+                <span>Thu</span>
+                <span>Fri</span>
+                <span>Sat</span>
+              </div>
+
+              <div class="calendar-grid" id="calendar-grid"></div>
+            </div>
+          </div>
+
+          <div class="time-selection">
+            <button class="time-dropdown">Select a time</button>
+
+            <!-- dropdown list later -->
+          </div>
+
+          <div class="schedule-action">
+            <button class="schedule-btn">Schedule</button>
+          </div>
+        </section>
+
+        <!-- COLUMN 3: STATUS & NOTES -->
+        <aside class="scheduler-column right-column">
+          <div class="order-status">
+            <span class="status-label">Status:</span>
+            <span class="status-value">Ordered</span>
+          </div>
+
+          <div class="notes-section">
+            <h3>Appointment Notes</h3>
+
+            <div class="notes-list">
+              <!-- individual notes -->
+              <div class="note-card">Note 1</div>
+              <div class="note-card">Note 2</div>
+              <div class="note-card">Note 3</div>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <!-- TEST -->
+
+      <!-- END -->
+    </main>
+
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+
+    <!-- IMAGE MODAL -->
+    <div id="imageModal" class="modal-backdrop">
+      <div class="modal-content">
+        <div class="modal-toolbar">
+          <div class="toolbar-center">
+            <button id="zoomOut" title="Zoom Out">
+              <ion-icon
+                name="remove-circle-outline"
+                class="circular-button"
+              ></ion-icon>
+            </button>
+            <button id="zoomIn" title="Zoom In">
+              <ion-icon
+                name="add-circle-outline"
+                class="circular-button"
+              ></ion-icon>
+            </button>
+            <button id="zoomReset" title="Reset">
+              <ion-icon
+                name="refresh-circle-outline"
+                class="circular-button"
+              ></ion-icon>
+            </button>
+          </div>
+          <button id="closeModal" title="Close">
+            <ion-icon name="close-circle-outline" class="closeModal"></ion-icon>
+          </button>
+        </div>
+
+        <div class="image-container">
+          <img id="modalImage" src="" alt="Preview" />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
