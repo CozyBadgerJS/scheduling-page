@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Scheduling</title>
     <link rel="stylesheet" href="edit-mode-styles.css" />
-    <link rel="stylesheet" href="view-mode-styles.css" />
 
     <script src="script.js" defer></script>
   </head>
@@ -562,7 +561,7 @@
               <button class="accordion-header">Uploads</button>
               <div class="accordion-content">
                 <!-- ORDER (always visible) -->
-                <div class="upload-category">
+                <div class="upload-category always-visible">
                   <div class="upload-header">
                     <h5>Referring Order</h5>
                     <label class="upload-btn">
@@ -577,8 +576,22 @@
                   <ul class="file-list"></ul>
                 </div>
 
+                <!-- FILTER DOCUMENT TYPE -->
+                <div class="uploads-filter">
+                  <label for="docFilter">Filter documents:</label>
+                  <select id="docFilter">
+                    <option value=""></option>
+                    <option value="all">All</option>
+                    <option value="insurance-card">Insurance Card</option>
+                    <option value="drivers-license">Driver's License</option>
+                    <option value="authorization">
+                      Insurance Authorization
+                    </option>
+                  </select>
+                </div>
+
                 <!-- INSURANCE CARD -->
-                <div class="upload-category">
+                <div class="upload-category" data-type="insurance-card">
                   <div class="upload-header">
                     <h5>Insurance Card</h5>
                     <label class="upload-btn">
@@ -596,7 +609,7 @@
                 </div>
 
                 <!-- AUTHORIZATION -->
-                <div class="upload-category">
+                <div class="upload-category" data-type="authorization">
                   <div class="upload-header">
                     <h5>Authorization</h5>
                     <label class="upload-btn">
@@ -610,13 +623,36 @@
 
                   <ul class="file-list"></ul>
                 </div>
+
+                <!-- DRIVER'S LICENCE -->
+                <div class="upload-category" data-type="drivers-license">
+                  <div class="upload-header">
+                    <h5>Drivers Licence</h5>
+                    <label class="upload-btn">
+                      <ion-icon
+                        name="cloud-upload-outline"
+                        class="upload-icon"
+                      ></ion-icon>
+                      <input type="file" hidden multiple />
+                    </label>
+                  </div>
+
+                  <ul class="file-list">
+                    <!-- files will go here -->
+                  </ul>
+                </div>
+                <button class="save-button">Save</button>
               </div>
             </section>
 
             <section class="accordion-section">
               <button class="accordion-header">Report</button>
               <div class="accordion-content">
-                <div class="upload-category">
+                <!-- REPORT FILE -->
+                <div
+                  class="upload-category always-visible"
+                  data-report-type="report"
+                >
                   <div class="upload-header">
                     <h5>Exam Report</h5>
                     <label class="upload-btn">
@@ -629,6 +665,24 @@
                   </div>
 
                   <ul class="file-list"></ul>
+                  <button class="send-btn">Send Report</button>
+                </div>
+
+                <!-- IMAGES -->
+                <div
+                  class="upload-category always-visible"
+                  data-report-type="images"
+                >
+                  <div class="upload-header">
+                    <h5>Images</h5>
+                    <label class="upload-btn">
+                      <ion-icon name="cloud-upload-outline"></ion-icon>
+                      <input type="file" hidden multiple />
+                    </label>
+                  </div>
+
+                  <ul class="file-list"></ul>
+                  <button class="send-btn">Send Images</button>
                 </div>
               </div>
             </section>
@@ -646,11 +700,9 @@
             <div class="control-group">
               <label for="clinic">Clinic</label>
               <!-- custom searchable dropdown later -->
-              <input
-                id="clinic"
-                type="text"
-                placeholder="Select or search clinic"
-              />
+              <select id="clinic">
+                <option value="">Select clinic</option>
+              </select>
             </div>
 
             <div class="control-group">
@@ -763,6 +815,46 @@
 
         <div class="image-container">
           <img id="modalImage" src="" alt="Preview" />
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+
+    <div id="deleteModal" class="modal-backdrop">
+      <div class="delete-modal">
+        <h3>Delete file?</h3>
+        <p id="deleteFileName" class="delete-filename"></p>
+
+        <p>This action cannot be undone.</p>
+
+        <div class="delete-actions">
+          <button id="cancelDelete">Cancel</button>
+          <button id="confirmDelete" class="danger">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEND REPORT MODAL -->
+    <div id="sendModal" class="modal-backdrop">
+      <div class="send-modal">
+        <h3>Send to</h3>
+
+        <div class="send-field">
+          <label>Fax</label>
+          <input type="text" id="sendFax" placeholder="Fax number" />
+        </div>
+
+        <div class="send-field">
+          <label>Email</label>
+          <input type="email" id="sendEmail" placeholder="Email address" />
+        </div>
+
+        <p id="sendError" class="error-message"></p>
+
+        <div class="send-actions">
+          <button id="cancelSend">Cancel</button>
+          <button id="confirmSend">Send</button>
         </div>
       </div>
     </div>

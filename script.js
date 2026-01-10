@@ -9,6 +9,65 @@ let startY = 0;
 let scrollLeft = 0;
 let scrollTop = 0;
 
+// DELETE FILE
+let fileToDelete = null;
+
+// CLINICS ''DATABASE''
+
+const clinics = [
+  {
+    id: "clinic1",
+    name: "Sunrise Medical Center",
+    rooms: ["Room Blue", "Room Red"],
+  },
+  {
+    id: "clinic2",
+    name: "Green Valley Imaging",
+    rooms: ["Room Yellow", "Room Green"],
+  },
+  {
+    id: "clinic3",
+    name: "Purple Cross Diagnostics",
+    rooms: ["Room Purple"],
+  },
+];
+
+// POPULATING CLINICS
+const clinicSelect = document.getElementById("clinic");
+const roomSelect = document.getElementById("room");
+
+// Populate clinic dropdown
+clinics.forEach((clinic) => {
+  const option = document.createElement("option");
+  option.value = clinic.id;
+  option.textContent = clinic.name;
+  clinicSelect.appendChild(option);
+});
+
+// UPDATE ROOM WHEN DIFFERENT CLINIC IS SELECTED
+
+clinicSelect.addEventListener("change", () => {
+  const selectedClinicId = clinicSelect.value;
+
+  // Reset room dropdown
+  roomSelect.innerHTML = `<option value="">Select room</option>`;
+
+  if (!selectedClinicId) return;
+
+  const selectedClinic = clinics.find(
+    (clinic) => clinic.id === selectedClinicId
+  );
+
+  if (!selectedClinic) return;
+
+  selectedClinic.rooms.forEach((room) => {
+    const option = document.createElement("option");
+    option.value = room;
+    option.textContent = room;
+    roomSelect.appendChild(option);
+  });
+});
+
 // TOGGLE ACCORDEON
 
 const accordionHeaders = document.querySelectorAll(".accordion-header");
@@ -98,6 +157,7 @@ document
     input.addEventListener("change", () => {
       const fileList = input
         .closest(".upload-category")
+
         .querySelector(".file-list");
 
       for (const file of input.files) {
@@ -137,16 +197,28 @@ document
         `;
 
         fileList.appendChild(li);
+        const category = input.closest(".upload-category");
+        const sendBtn = category.querySelector(".send-btn");
+        if (sendBtn) {
+          sendBtn.style.display = "inline-block";
+        }
       }
 
       input.value = "";
     });
   });
 
-// VIEW BUTTON FOR IMAGES// VIEW BUTTON FOR IMAGES
+// VIEW BUTTON FOR IMAGES
 
 const modal = document.getElementById("imageModal");
 const modalImage = document.getElementById("modalImage");
+
+// DELETE FILE MODAL
+
+const deleteModal = document.getElementById("deleteModal");
+const confirmDeleteBtn = document.getElementById("confirmDelete");
+const cancelDeleteBtn = document.getElementById("cancelDelete");
+const deleteFileNameEl = document.getElementById("deleteFileName");
 
 // Disable native browser image dragging
 modalImage.setAttribute("draggable", "false");
@@ -213,26 +285,6 @@ document.addEventListener("keydown", (e) => {
     currentScale = Math.max(0.2, currentScale - SCALE_STEP);
     modalImage.style.transform = `scale(${currentScale})`;
   }
-});
-
-// Arrow key panning (up / down)
-document.addEventListener("keydown", (e) => {
-  if (!modal.classList.contains("active")) return;
-
-  const MOVE_STEP = 20;
-
-  if (e.key === "ArrowUp") {
-    translateY += MOVE_STEP;
-  }
-
-  if (e.key === "ArrowDown") {
-    translateY -= MOVE_STEP;
-  }
-
-  modalImage.style.transform = `
-    translate(${translateX}px, ${translateY}px)
-    scale(${currentScale})
-  `;
 });
 
 const imageContainer = document.querySelector(".image-container");
@@ -318,24 +370,143 @@ closeModalBtn.addEventListener("click", () => {
   document.body.classList.remove("modal-open");
 });
 
-// View button logic
+/// View + Download button logic
 
 document.addEventListener("click", (e) => {
   const viewBtn = e.target.closest(".view-btn");
-  if (!viewBtn) return;
+  const downloadBtn = e.target.closest(".download-btn");
 
-  const fileItem = viewBtn.closest(".file-item");
-  const file = fileItem.file;
+  if (!viewBtn && !downloadBtn) return;
+
+  const fileItem = e.target.closest(".file-item");
+  const file = fileItem?.file;
   if (!file) return;
 
   const fileURL = URL.createObjectURL(file);
 
-  if (file.type.startsWith("image/")) {
-    modalImage.src = fileURL;
-    resetZoom();
-    modal.classList.add("active");
-    document.body.classList.add("modal-open");
-  } else if (file.type === "application/pdf") {
-    window.open(fileURL, "_blank");
+  // VIEW
+  if (viewBtn) {
+    if (file.type.startsWith("image/")) {
+      modalImage.src = fileURL;
+      resetZoom();
+      modal.classList.add("active");
+      document.body.classList.add("modal-open");
+    } else if (file.type === "application/pdf") {
+      window.open(fileURL, "_blank");
+    }
+    return;
   }
+
+  // DOWNLOAD
+  if (downloadBtn) {
+    const a = document.createElement("a");
+    a.href = fileURL;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(fileURL);
+  }
+});
+// DELETE button (open modal)
+document.addEventListener("click", (e) => {
+  const deleteBtn = e.target.closest(".delete-btn");
+  if (!deleteBtn) return;
+
+  fileToDelete = deleteBtn.closest(".file-item");
+
+  // 🔹 Get file name
+  const fileName = fileToDelete.querySelector(".file-name")?.textContent || "";
+
+  // 🔹 Inject file name into modal
+  deleteFileNameEl.textContent = `"${fileName}"`;
+
+  deleteModal.classList.add("active");
+});
+
+// CONFIRM delete
+confirmDeleteBtn.addEventListener("click", () => {
+  if (!fileToDelete) return;
+
+  const category = fileToDelete.closest(".upload-category");
+  const fileList = category.querySelector(".file-list");
+  const sendBtn = category.querySelector(".send-btn");
+
+  // Remove the file
+  fileToDelete.remove();
+  fileToDelete = null;
+
+  // If no files remain → hide send button
+  if (fileList.children.length === 0 && sendBtn) {
+    sendBtn.style.display = "none";
+  }
+
+  deleteModal.classList.remove("active");
+});
+
+// CANCEL delete
+cancelDeleteBtn.addEventListener("click", () => {
+  fileToDelete = null;
+  deleteModal.classList.remove("active");
+  deleteFileNameEl.textContent = "";
+});
+
+//FILTERING PER DOCUMENT TYPE
+const filterSelect = document.getElementById("docFilter");
+const categories = document.querySelectorAll(".upload-category[data-type]");
+filterSelect.addEventListener("change", () => {
+  const value = filterSelect.value;
+
+  categories.forEach((category) => {
+    if (value === "all") {
+      category.style.display = "block";
+    } else if (category.dataset.type === value) {
+      category.style.display = "block";
+    } else {
+      category.style.display = "none";
+    }
+  });
+});
+// SEND REPORT MODAL
+const sendModal = document.getElementById("sendModal");
+const sendFaxInput = document.getElementById("sendFax");
+const sendEmailInput = document.getElementById("sendEmail");
+const sendError = document.getElementById("sendError");
+
+let fileToSend = null;
+
+// Open send modal
+document.addEventListener("click", (e) => {
+  const sendBtn = e.target.closest(".send-btn");
+  if (!sendBtn) return;
+
+  fileToSend = sendBtn.closest(".file-item");
+
+  sendError.textContent = "";
+  sendFaxInput.value = "";
+  sendEmailInput.value = "";
+
+  sendModal.classList.add("active");
+});
+
+// Confirm send
+document.getElementById("confirmSend").addEventListener("click", () => {
+  const fax = sendFaxInput.value.trim();
+  const email = sendEmailInput.value.trim();
+
+  if (!fax && !email) {
+    sendError.textContent = "Please enter a fax number or email.";
+    return;
+  }
+
+  // Simulation success
+  sendModal.classList.remove("active");
+  fileToSend = null;
+});
+
+// Cancel send
+document.getElementById("cancelSend").addEventListener("click", () => {
+  sendModal.classList.remove("active");
+  fileToSend = null;
 });
