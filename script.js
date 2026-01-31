@@ -17,24 +17,34 @@ let fileToDelete = null;
 const clinics = [
   {
     id: "clinic1",
-    name: "Sunrise Medical Center",
-    rooms: ["Room Blue", "Room Red"],
+    name: "Tejones Medical Center",
+    rooms: ["Yellow Room", "Black Room"],
   },
   {
     id: "clinic2",
-    name: "Green Valley Imaging",
-    rooms: ["Room Yellow", "Room Green"],
+    name: "Culebras Diagnostics",
+    rooms: ["Green Room", "Silver Room"],
   },
   {
     id: "clinic3",
-    name: "Purple Cross Diagnostics",
-    rooms: ["Room Purple"],
+    name: "Aguilas Imaging",
+    rooms: ["Blue Room", "Bronze Room"],
+  },
+  {
+    id: "clinic4",
+    name: "Leones Clinics",
+    rooms: ["Red Room", "Gold Room"],
   },
 ];
+
+// GENERATE TIME SLOTS FOR EXAMS
+let selectedDate = null;
+let selectedTime = null;
 
 // POPULATING CLINICS
 const clinicSelect = document.getElementById("clinic");
 const roomSelect = document.getElementById("room");
+const timeSelect = document.getElementById("select-time");
 
 // Populate clinic dropdown
 clinics.forEach((clinic) => {
@@ -55,7 +65,7 @@ clinicSelect.addEventListener("change", () => {
   if (!selectedClinicId) return;
 
   const selectedClinic = clinics.find(
-    (clinic) => clinic.id === selectedClinicId
+    (clinic) => clinic.id === selectedClinicId,
   );
 
   if (!selectedClinic) return;
@@ -79,9 +89,229 @@ accordionHeaders.forEach((header) => {
   });
 });
 
+// NOTES SECTION (INLINE, APPEND-ONLY)
+
+function sortNotes(container, order = "newest") {
+  const notes = Array.from(container.querySelectorAll(".note-card"));
+
+  notes.sort((a, b) => {
+    const timeA = Number(a.dataset.timestamp);
+    const timeB = Number(b.dataset.timestamp);
+
+    return order === "newest" ? timeB - timeA : timeA - timeB;
+  });
+
+  notes.forEach((note) => container.appendChild(note));
+}
+
+function noteIsTruncated(noteContentEl) {
+  return noteContentEl.scrollHeight > noteContentEl.clientHeight;
+}
+
+const addNoteBtn = document.querySelector(".add-note-btn");
+const notesList = document.querySelector(".notes-list");
+
+const placeholderNote = document.querySelector(".note-content[data-note]");
+
+if (placeholderNote) {
+  placeholderNote.textContent =
+    "Pt requested later appointment due to work.\n\nWill call back if availability changes.";
+}
+
+const notesSort = document.querySelector(".notes-sort");
+const modalNotesSort = document.getElementById("modalNotesSort");
+
+if (notesSort) {
+  notesSort.addEventListener("change", () => {
+    sortNotes(notesList, notesSort.value);
+
+    if (modalNotesSort) {
+      modalNotesSort.value = notesSort.value;
+    }
+  });
+}
+
+if (modalNotesSort) {
+  modalNotesSort.addEventListener("change", () => {
+    notesSort.value = modalNotesSort.value;
+    sortNotes(notesList, modalNotesSort.value);
+    viewAllBtn.click();
+  });
+}
+
+addNoteBtn.addEventListener("click", () => {
+  // Prevent multiple editors
+  if (document.querySelector(".note-editor")) return;
+
+  addNoteBtn.disabled = true;
+
+  const editor = document.createElement("div");
+  editor.className = "note-card note-editor";
+
+  editor.innerHTML = `
+    <div class="note-meta">
+      <span class="note-author">Scheduler – Cozy Badger</span>
+      <span class="note-time">New note</span>
+    </div>
+
+    <textarea class="note-editor-text" rows="4"
+      placeholder="Type your note here..."></textarea>
+
+    <div class="note-actions">
+      <button class="save-inline-note">Save</button>
+      <button class="cancel-inline-note">Cancel</button>
+    </div>
+  `;
+
+  notesList.prepend(editor);
+  editor.querySelector(".note-editor-text").focus();
+});
+
+document.addEventListener("click", (e) => {
+  // SAVE note
+  if (e.target.classList.contains("save-inline-note")) {
+    const editor = e.target.closest(".note-editor");
+    const textarea = editor.querySelector(".note-editor-text");
+    const text = textarea.value.trim();
+
+    if (!text) return;
+
+    const now = new Date();
+    const timestamp = now.getTime();
+
+    const formattedDate = now.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    const formattedTime = now.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+
+    const noteCard = document.createElement("div");
+    noteCard.className = "note-card";
+    noteCard.dataset.timestamp = timestamp;
+
+    noteCard.innerHTML = `
+  <div class="note-meta">
+    <span class="note-author">Scheduler – Cozy Badger</span>
+    <span class="note-time">${formattedDate} · ${formattedTime}</span>
+  </div>
+
+ <div class="note-content">${text}</div>
+
+
+  <div class="note-actions">
+    <button class="delete-note-btn">Delete</button>
+  </div>
+`;
+
+    editor.replaceWith(noteCard);
+    addNoteBtn.disabled = false;
+    sortNotes(notesList, notesSort.value);
+
+    //  CHECK IF NOTE IS TRUNCATED
+    const noteContent = noteCard.querySelector(".note-content");
+    requestAnimationFrame(() => {
+      if (noteIsTruncated(noteContent)) {
+        const toggleBtn = document.createElement("button");
+        toggleBtn.className = "toggle-note-btn";
+        toggleBtn.textContent = "View more";
+
+        noteCard.querySelector(".note-actions").prepend(toggleBtn);
+      }
+    });
+
+    // Replace editor ONCE
+    editor.replaceWith(noteCard);
+    addNoteBtn.disabled = false;
+  }
+
+  // CANCEL note
+  if (e.target.classList.contains("cancel-inline-note")) {
+    e.target.closest(".note-editor").remove();
+    addNoteBtn.disabled = false;
+  }
+
+  // DELETE note (training only)
+  if (e.target.classList.contains("delete-note-btn")) {
+    e.target.closest(".note-card").remove();
+  }
+
+  // EXPAND / COLLAPSE note
+  if (e.target.classList.contains("toggle-note-btn")) {
+    // 🚫 Do nothing if click is inside "View All Notes" modal
+    if (e.target.closest("#viewAllNotesModal")) return;
+
+    const noteCard = e.target.closest(".note-card");
+    const isExpanded = noteCard.classList.toggle("expanded");
+
+    e.target.textContent = isExpanded ? "View less" : "View more";
+  }
+});
+
+// ==========================
+// VIEW ALL NOTES MODAL
+// ==========================
+
+const viewAllBtn = document.querySelector(".view-all-notes-btn");
+const viewAllModal = document.getElementById("viewAllNotesModal");
+const viewAllBody = viewAllModal.querySelector(".notes-modal-body");
+const closeViewAllBtn = viewAllModal.querySelector(".close-view-notes");
+
+viewAllBtn.addEventListener("click", () => {
+  if (modalNotesSort) {
+    modalNotesSort.value = notesSort.value;
+  }
+
+  viewAllBody.innerHTML = "";
+
+  const notes = Array.from(
+    document.querySelectorAll(".notes-list .note-card"),
+  ).sort((a, b) => {
+    const timeA = Number(a.dataset.timestamp);
+    const timeB = Number(b.dataset.timestamp);
+    return notesSort.value === "newest" ? timeB - timeA : timeA - timeB;
+  });
+
+  notes.forEach((note) => {
+    const clone = note.cloneNode(true);
+    clone.classList.remove("expanded");
+
+    // Remove note action buttons (View more / Delete)
+    const actions = clone.querySelector(".note-actions");
+    if (actions) actions.remove();
+    const toggleBtn = clone.querySelector(".toggle-note-btn");
+    if (toggleBtn) toggleBtn.remove();
+
+    // Ensure full content display
+    const content = clone.querySelector(".note-content");
+    if (content) {
+      content.style.maxHeight = "none";
+      content.style.overflow = "visible";
+      content.style.display = "block";
+      content.style.webkitLineClamp = "unset";
+    }
+
+    viewAllBody.appendChild(clone);
+  });
+
+  viewAllModal.classList.add("active");
+  document.body.classList.add("modal-open");
+});
+
+closeViewAllBtn.addEventListener("click", () => {
+  viewAllModal.classList.remove("active");
+  document.body.classList.remove("modal-open");
+});
+
 // CALENDAR
 
 let currentDate = new Date();
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
 function renderCalendar(date) {
   const grid = document.getElementById("calendar-grid");
   const label = document.getElementById("month-label");
@@ -114,14 +344,49 @@ function renderCalendar(date) {
   for (let day = 1; day <= daysInMonth; day++) {
     const btn = document.createElement("button");
     btn.textContent = day;
-    btn.classList.add("calendar-day");
+    const thisDay = new Date(year, month, day);
+    thisDay.setHours(0, 0, 0, 0);
 
+    // 🔒 Disable past dates
+    if (thisDay < today) {
+      btn.disabled = true;
+      btn.classList.add("disabled");
+    } else {
+      //  Click only allowed for valid dates
+      btn.addEventListener("click", () => {
+        document
+          .querySelectorAll(".calendar-day.selected")
+          .forEach((d) => d.classList.remove("selected"));
+
+        btn.classList.add("selected");
+
+        selectedDate = thisDay;
+        updateTimeSlots(selectedDate);
+      });
+    }
+
+    // 🔹 Highlight today
+    if (thisDay.getTime() === today.getTime()) {
+      btn.classList.add("today");
+    }
     grid.appendChild(btn);
   }
 }
 renderCalendar(currentDate);
 
 document.getElementById("prev-month").addEventListener("click", () => {
+  const prevMonth = new Date(currentDate);
+  prevMonth.setMonth(prevMonth.getMonth() - 1);
+
+  // Prevent navigating to past months
+  if (
+    prevMonth.getFullYear() < today.getFullYear() ||
+    (prevMonth.getFullYear() === today.getFullYear() &&
+      prevMonth.getMonth() < today.getMonth())
+  ) {
+    return;
+  }
+
   currentDate.setMonth(currentDate.getMonth() - 1);
   renderCalendar(currentDate);
 });
@@ -149,6 +414,54 @@ document.getElementById("next-month").addEventListener("click", () => {
 // ) {
 //   btn.classList.add("today");
 // }
+
+// TIME SLOT GENERATOR
+function updateTimeSlots(date) {
+  timeSelect.innerHTML = `<option value="" disabled selected></option>`;
+  timeSelect.disabled = true;
+  selectedTime = null;
+
+  if (!date) return;
+
+  const now = new Date();
+  now.setSeconds(0, 0);
+
+  const isToday =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+
+  const startHour = 8;
+  const endHour = 22;
+  const intervalMinutes = 15;
+
+  const slotTime = new Date(date);
+  slotTime.setHours(startHour, 0, 0, 0);
+
+  const endTime = new Date(date);
+  endTime.setHours(endHour, 0, 0, 0);
+
+  while (slotTime < endTime) {
+    if (!isToday || slotTime > now) {
+      const option = document.createElement("option");
+
+      const hours = slotTime.getHours();
+      const minutes = slotTime.getMinutes();
+      const ampm = hours >= 12 ? "PM" : "AM";
+      const displayHour = hours % 12 || 12;
+      const displayMinutes = minutes.toString().padStart(2, "0");
+
+      option.value = slotTime.toISOString();
+      option.textContent = `${displayHour}:${displayMinutes} ${ampm}`;
+
+      timeSelect.appendChild(option);
+    }
+
+    slotTime.setMinutes(slotTime.getMinutes() + intervalMinutes);
+  }
+
+  timeSelect.disabled = false;
+}
 
 // UPLOADS SECTION
 document
@@ -353,7 +666,7 @@ document.addEventListener("keydown", (e) => {
       e.preventDefault();
       container.scrollTop = Math.min(
         maxScrollTop,
-        container.scrollTop + SCROLL_STEP
+        container.scrollTop + SCROLL_STEP,
       );
       break;
 

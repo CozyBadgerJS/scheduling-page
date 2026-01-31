@@ -146,9 +146,9 @@ body {
 /* TEST */
 /* PAGE WRAPPER */
 .scheduler-page {
-  height: 100vh;
+  height: 80vh;
   width: 100%;
-  background: #f5f6f8;
+  background: #cec2eb;
 }
 
 /* MAIN GRID */
@@ -165,7 +165,7 @@ body {
   background: #ffffff;
   border-radius: 8px;
   padding: 1.6rem;
-  overflow: hidden; /* important */
+  overflow: visible;
 }
 
 /* SCROLLABLE COLUMNS */
@@ -173,11 +173,6 @@ body {
 .right-column {
   overflow-y: auto;
 }
-
-/* CENTER COLUMN (NO SCROLL FOR NOW) */
-/* .center-column {
-  display: flex;
-} */
 
 .accordion {
   display: flex;
@@ -327,7 +322,9 @@ body {
   background-color: #eef1f5;
   color: #2b2b2b;
   box-shadow: 0px 8px 24px rgba(149, 157, 165, 0.2);
-  transition: all 0.2s ease, color 0.2s ease;
+  transition:
+    all 0.2s ease,
+    color 0.2s ease;
 }
 
 .file-list {
@@ -422,6 +419,12 @@ body {
   border-radius: 8px;
   display: flex;
   flex-direction: column;
+  padding: 1rem;
+}
+
+.modal-body textarea {
+  width: 100%;
+  resize: vertical;
 }
 
 .modal-toolbar {
@@ -458,14 +461,18 @@ body {
   color: white;
 
   border-radius: 50%;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .circular-button:hover {
   background-color: #eef1f5;
   color: #3d3d3d;
   box-shadow: 0px 8px 24px rgba(149, 157, 165, 0.2);
-  transition: all 0.2s ease, color 0.2s ease;
+  transition:
+    all 0.2s ease,
+    color 0.2s ease;
 }
 
 .image-container {
@@ -581,4 +588,133 @@ body.modal-open {
 
 .modal-backdrop.active {
   display: flex;
+}
+
+/* SCHEDULER NOTES */
+.notes-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+}
+
+.note-card {
+  background: #f9f9f9;
+  border-left: 4px solid #6a5acd; /* placeholder accent color */
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 90px;
+  margin-top: 10px;
+}
+
+.note-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.note-content {
+  font-size: 1.4rem;
+  color: #333;
+
+  max-height: 6rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  white-space: pre-wrap; /* preserves line breaks between parapraphs */
+}
+.note-content button {
+  display: flex;
+  align-self: flex-start;
+}
+
+.note-card.expanded .note-content {
+  max-height: none;
+  overflow: visible;
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+.notes-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+.notes-actions button {
+  font-size: 1.2rem;
+  padding: 4px 8px;
+
+  width: auto;
+  white-space: nowrap;
+}
+
+.note-editor-text {
+  width: 100%;
+  min-height: 8rem;
+  max-height: 30rem;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 1.4rem;
+  line-height: 1.5;
+}
+
+/* VIEW ALL NOTES MODAL */
+
+.notes-modal {
+  max-width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.notes-modal-body {
+  padding: 1.6rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+#viewAllNotesModal .note-card {
+  min-height: unset;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+#viewAllNotesModal .note-content {
+  max-height: none;
+  height: auto;
+  overflow: visible;
+
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
+  white-space: pre-wrap;
+}
+.notes-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 1.6rem 0.6rem;
+}
+
+.notes-modal-header label {
+  font-size: 1.3rem;
+  color: #444;
+}
+
+.notes-modal-header select {
+  font-size: 1.3rem;
+  padding: 0.3rem 0.5rem;
 }

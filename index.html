@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -63,7 +63,7 @@
         </div>
       </div>
     </header>
-    <>
+
     <div class="container">
       <!-- EDIT MODE -->
 
@@ -740,7 +740,10 @@
           </div>
 
           <div class="time-selection">
-            <button class="time-dropdown">Select a time</button>
+            <label for="select-time">Select a time</label>
+            <select id="select-time" disabled>
+              <option value=""></option>
+            </select>
 
             <!-- dropdown list later -->
           </div>
@@ -752,20 +755,34 @@
 
         <!-- COLUMN 3: STATUS & NOTES -->
         <aside class="scheduler-column right-column">
-          <div class="order-status">
-            <span class="status-label">Status:</span>
-            <span class="status-value">Ordered</span>
+          <div class="notes-header">
+            <h3>Notes</h3>
+
+            <div class="notes-actions">
+              <button class="add-note-btn">Add note</button>
+              <button class="view-all-notes-btn">View all</button>
+              <select class="notes-sort">
+                <option value="newest" selected>Newest first</option>
+                <option value="oldest">Oldest first</option>
+              </select>
+            </div>
           </div>
 
-          <div class="notes-section">
-            <h3>Appointment Notes</h3>
+          <div class="notes-list">
+            <!-- Single note (example / placeholder) -->
+            <div class="note-card">
+              <div class="note-meta">
+                <span class="note-author">Scheduler – Cozy Badger</span>
+                <span class="note-time">Jan 10, 2026 · 5:32 PM</span>
+              </div>
 
-            <div class="notes-list">
-              <!-- individual notes -->
-              <div class="note-card">Note 1</div>
-              <div class="note-card">Note 2</div>
-              <div class="note-card">Note 3</div>
+              <div class="note-content" data-note></div>
+              <div class="notes-actions">
+                <button class="delete-note-btn">Delete</button>
+              </div>
             </div>
+
+            <!-- More note-card elements will be appended later -->
           </div>
         </aside>
       </section>
@@ -831,6 +848,28 @@
         <div class="delete-actions">
           <button id="cancelDelete">Cancel</button>
           <button id="confirmDelete" class="danger">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISPLAY ALL NOTES -->
+    <div class="modal-backdrop" id="viewAllNotesModal">
+      <div class="modal-content notes-modal">
+        <div class="modal-toolbar">
+          <span>All Notes</span>
+          <button class="close-view-notes">&times;</button>
+        </div>
+
+        <div class="notes-modal-header">
+          <label for="modalNotesSort">Sort notes:</label>
+          <select id="modalNotesSort">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+          </select>
+        </div>
+
+        <div class="notes-modal-body">
+          <!-- Notes will be injected here -->
         </div>
       </div>
     </div>
