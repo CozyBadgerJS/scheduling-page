@@ -333,42 +333,51 @@ function renderCalendar(date) {
   // Number of days in month
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  // Empty cells before the 1st
-  for (let i = 0; i < firstDay; i++) {
-    const empty = document.createElement("div");
-    empty.classList.add("empty");
-    grid.appendChild(empty);
-  }
+  //  Always render 6 weeks (42 cells)
+  const totalCells = 42;
+  let dayCounter = 1;
 
-  // Actual days
-  for (let day = 1; day <= daysInMonth; day++) {
+  for (let i = 0; i < totalCells; i++) {
     const btn = document.createElement("button");
-    btn.textContent = day;
-    const thisDay = new Date(year, month, day);
-    thisDay.setHours(0, 0, 0, 0);
+    btn.classList.add("calendar-day");
 
-    // 🔒 Disable past dates
-    if (thisDay < today) {
-      btn.disabled = true;
-      btn.classList.add("disabled");
+    // Valid days of the current month
+    if (i >= firstDay && dayCounter <= daysInMonth) {
+      btn.textContent = dayCounter;
+
+      const thisDay = new Date(year, month, dayCounter);
+      thisDay.setHours(0, 0, 0, 0);
+
+      // 🔒 Disable past dates
+      if (thisDay < today) {
+        btn.disabled = true;
+        btn.classList.add("disabled");
+      } else {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".calendar-day.selected")
+            .forEach((d) => d.classList.remove("selected"));
+
+          btn.classList.add("selected");
+
+          selectedDate = thisDay;
+          updateTimeSlots(selectedDate);
+        });
+      }
+
+      // 🔹 Highlight today
+      if (thisDay.getTime() === today.getTime()) {
+        btn.classList.add("today");
+      }
+
+      dayCounter++;
     } else {
-      //  Click only allowed for valid dates
-      btn.addEventListener("click", () => {
-        document
-          .querySelectorAll(".calendar-day.selected")
-          .forEach((d) => d.classList.remove("selected"));
-
-        btn.classList.add("selected");
-
-        selectedDate = thisDay;
-        updateTimeSlots(selectedDate);
-      });
+      // Empty placeholder cells
+      btn.disabled = true;
+      btn.classList.add("empty");
+      btn.textContent = "";
     }
 
-    // 🔹 Highlight today
-    if (thisDay.getTime() === today.getTime()) {
-      btn.classList.add("today");
-    }
     grid.appendChild(btn);
   }
 }
@@ -395,25 +404,6 @@ document.getElementById("next-month").addEventListener("click", () => {
   currentDate.setMonth(currentDate.getMonth() + 1);
   renderCalendar(currentDate);
 });
-
-// DISABLE PAST DATES
-// const today = new Date();
-// today.setHours(0, 0, 0, 0);
-
-// const currentDay = new Date(year, month, day);
-
-// if (currentDay < today) {
-//   btn.disabled = true;
-//   btn.classList.add("disabled");
-// }
-
-// if (
-//   day === today.getDate() &&
-//   month === today.getMonth() &&
-//   year === today.getFullYear()
-// ) {
-//   btn.classList.add("today");
-// }
 
 // TIME SLOT GENERATOR
 function updateTimeSlots(date) {

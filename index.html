@@ -197,8 +197,8 @@
           </div>
         </fieldset>
       </form>
-      <button>Edit</button>
-      <button>Save</button>
+      <button class="edit-button">Edit</button>
+      <button class="save-button">Save</button>
     </div>
     <!-- SECONDARY INSURANCE -->
     <div class="container">
@@ -429,8 +429,8 @@
                   >
                   <input id="screening-question" type="text" />
                 </div>
-                <button class="save-button">Save</button
-                ><button class="edit-button">Edit</button>
+                <button class="edit-button">Edit</button
+                ><button class="save-button">Save</button>
               </div>
             </section>
 
@@ -552,8 +552,8 @@
                   <label for="tab-sec-insurance-holder-dob">DOB</label>
                   <input id="tab-sec-insurance-holder-dob" type="date" />
                 </div>
-                <button class="save-button">Save</button>
-                <button class="edit-button">Edit</button>
+                <button class="edit-button">Edit</button
+                ><button class="save-button">Save</button>
               </div>
             </section>
 
@@ -691,65 +691,75 @@
 
         <!-- COLUMN 2: SCHEDULING -->
         <section class="scheduler-column center-column">
-          <div class="scheduler-controls">
-            <div class="control-group">
-              <label for="zip-code">ZIP Code</label>
-              <input id="zip-code" type="text" />
+          <!-- TOP INFO PANEL -->
+          <div class="calendar-panel">
+            <div class="calendar-panel-header">
+              <div class="location-info">
+                <div class="info-row zip-row">
+                  <label for="zip-code">ZIP Code</label>
+                  <input id="zip-code" type="text" />
+                </div>
+
+                <div class="info-row clinic-row">
+                  <label for="clinic">Clinic</label>
+                  <select id="clinic">
+                    <option value="">Select clinic</option>
+                  </select>
+                </div>
+
+                <div class="info-row room-row">
+                  <label for="room">Room</label>
+                  <select id="room">
+                    <option value="">Select room</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
-            <div class="control-group">
-              <label for="clinic">Clinic</label>
-              <!-- custom searchable dropdown later -->
-              <select id="clinic">
-                <option value="">Select clinic</option>
-              </select>
-            </div>
+            <!-- CALENDAR BODY (UNCHANGED LOGIC) -->
+            <div class="calendar-panel-body">
+              <div class="calendar-container">
+                <div class="calendar">
+                  <div class="calendar-header">
+                    <button id="prev-month">
+                      <ion-icon name="chevron-back-outline"></ion-icon>
+                    </button>
 
-            <div class="control-group">
-              <label for="room">Room</label>
-              <select id="room">
-                <option value="">Select room</option>
-              </select>
-            </div>
-          </div>
+                    <h3 id="month-label"></h3>
 
-          <div class="calendar-container">
-            <div class="calendar">
-              <div class="calendar-header">
-                <button id="prev-month">
-                  <ion-icon name="chevron-back-outline"></ion-icon>
-                </button>
-                <h3 id="month-label"></h3>
-                <button id="next-month">
-                  <ion-icon name="chevron-forward-outline"></ion-icon>
-                </button>
+                    <button id="next-month">
+                      <ion-icon name="chevron-forward-outline"></ion-icon>
+                    </button>
+                  </div>
+
+                  <div class="calendar-weekdays">
+                    <span>Sun</span>
+                    <span>Mon</span>
+                    <span>Tue</span>
+                    <span>Wed</span>
+                    <span>Thu</span>
+                    <span>Fri</span>
+                    <span>Sat</span>
+                  </div>
+
+                  <div class="calendar-grid" id="calendar-grid"></div>
+                </div>
               </div>
 
-              <div class="calendar-weekdays">
-                <span>Sun</span>
-                <span>Mon</span>
-                <span>Tue</span>
-                <span>Wed</span>
-                <span>Thu</span>
-                <span>Fri</span>
-                <span>Sat</span>
+              <div class="time-selection">
+                <label for="select-time">Select a Time</label>
+                <select id="select-time" disabled>
+                  <option value="">--:--</option>
+                </select>
               </div>
-
-              <div class="calendar-grid" id="calendar-grid"></div>
             </div>
-          </div>
 
-          <div class="time-selection">
-            <label for="select-time">Select a time</label>
-            <select id="select-time" disabled>
-              <option value=""></option>
-            </select>
+            <!-- FOOTER: STATUS + ACTION -->
+            <div class="calendar-panel-footer">
+              <span class="status-badge status-ordered">Ordered</span>
 
-            <!-- dropdown list later -->
-          </div>
-
-          <div class="schedule-action">
-            <button class="schedule-btn">Schedule</button>
+              <button class="schedule-btn">Schedule</button>
+            </div>
           </div>
         </section>
 
