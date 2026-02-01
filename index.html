@@ -377,8 +377,13 @@
                   />
                 </div>
 
-                <button>Edit</button><button>Save</button>
-                <button>Add new Physician</button>
+                <div class="accordion-actions">
+                  <div class="primary-actions">
+                    <button class="edit-button">Edit</button
+                    ><button class="add-dr-button">Add new</button>
+                    <button class="save-button">Save</button>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -429,8 +434,12 @@
                   >
                   <input id="screening-question" type="text" />
                 </div>
-                <button class="edit-button">Edit</button
-                ><button class="save-button">Save</button>
+                <div class="accordion-actions">
+                  <div class="primary-actions">
+                    <button class="edit-button">Edit</button>
+                    <button class="save-button">Save</button>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -461,6 +470,7 @@
                     id="insurance-relationship"
                     name="insurance-relationship"
                   >
+                    <option value=""></option>
                     <option value="self">Self</option>
                     <option value="mother">Mother</option>
                     <option value="father">Father</option>
@@ -470,6 +480,11 @@
                     <option value="son">Son</option>
                     <option value="other">Other</option>
                   </select>
+                </div>
+
+                <div class="accordion-field">
+                  <label for="prim-insurance-member-id">Member ID</label>
+                  <input id="prim-insurance-member-id" type="text" />
                 </div>
 
                 <div class="accordion-field">
@@ -520,6 +535,7 @@
                     id="insurance-relationship"
                     name="insurance-relationship"
                   >
+                    <option value=""></option>
                     <option value="self">Self</option>
                     <option value="mother">Mother</option>
                     <option value="father">Father</option>
@@ -531,6 +547,10 @@
                   </select>
                 </div>
 
+                <div class="accordion-field">
+                  <label for="prim-insurance-member-id">Member ID</label>
+                  <input id="prim-insurance-member-id" type="text" />
+                </div>
                 <div class="accordion-field">
                   <label for="tab-sec-insurance-holder-name"
                     >Insurance Holder</label
@@ -552,8 +572,12 @@
                   <label for="tab-sec-insurance-holder-dob">DOB</label>
                   <input id="tab-sec-insurance-holder-dob" type="date" />
                 </div>
-                <button class="edit-button">Edit</button
-                ><button class="save-button">Save</button>
+                <div class="accordion-actions">
+                  <div class="primary-actions">
+                    <button class="edit-button">Edit</button>
+                    <button class="save-button">Save</button>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -641,7 +665,11 @@
                     <!-- files will go here -->
                   </ul>
                 </div>
-                <button class="save-button">Save</button>
+                <div class="accordion-actions">
+                  <div class="primary-actions">
+                    <button class="save-button">Save</button>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -695,6 +723,10 @@
           <div class="calendar-panel">
             <div class="calendar-panel-header">
               <div class="location-info">
+                <div class="info-row">
+                  <label>Status</label>
+                  <div class="status-badge status-ordered">Ordered</div>
+                </div>
                 <div class="info-row zip-row">
                   <label for="zip-code">ZIP Code</label>
                   <input id="zip-code" type="text" />
@@ -716,7 +748,7 @@
               </div>
             </div>
 
-            <!-- CALENDAR BODY (UNCHANGED LOGIC) -->
+            <!-- CALENDAR BODY -->
             <div class="calendar-panel-body">
               <div class="calendar-container">
                 <div class="calendar">
@@ -756,8 +788,6 @@
 
             <!-- FOOTER: STATUS + ACTION -->
             <div class="calendar-panel-footer">
-              <span class="status-badge status-ordered">Ordered</span>
-
               <button class="schedule-btn">Schedule</button>
             </div>
           </div>
@@ -791,8 +821,6 @@
                 <button class="delete-note-btn">Delete</button>
               </div>
             </div>
-
-            <!-- More note-card elements will be appended later -->
           </div>
         </aside>
       </section>

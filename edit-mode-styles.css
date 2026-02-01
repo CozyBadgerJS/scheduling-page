@@ -173,18 +173,55 @@ body {
 .accordion {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
+}
+
+/* ACTIONS AREA INSIDE ACCORDION */
+.accordion-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+/* BUTTONS
+Edit + Save row */
+.primary-actions {
+  display: flex;
+  gap: 0.6rem;
+
+  justify-content: flex-end;
+
+  margin-top: 0.8rem;
+}
+
+/* Secondary action (Add / Change Physician) */
+.add-dr-button {
+  font-size: 1.2rem;
+  background: transparent;
+  color: #2563eb;
+  border: 1px dashed #c7d2fe;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.add-dr-button:hover {
+  background: #eef2ff;
 }
 
 .accordion-section {
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  background: #ffffff;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 
 .accordion-header {
   width: 100%;
-  padding: 1.2rem;
+  padding: 1.2rem 1.4rem;
   background: #eef1f5;
   border: none;
   font-weight: 600;
@@ -193,9 +230,23 @@ body {
 }
 
 .accordion-content {
-  padding: 1.2rem;
+  padding: 1.6rem;
   display: none;
   background: #fff;
+}
+
+.accordion-content span {
+  font-size: 1.4rem;
+  line-height: 1.1;
+  color: #374151;
+}
+
+.accordion-content button {
+  margin-top: 1rem;
+}
+
+.accordion-content button + button {
+  margin-left: 0.6rem;
 }
 
 .accordion-section.open .accordion-content {
@@ -212,20 +263,42 @@ body {
 .accordion-field {
   display: flex;
   flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.2rem;
 }
 
 .accordion-field label {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  color: #666;
+  color: #6b7280;
   margin-bottom: 0.4rem;
 }
 
-.accordion-field span,
-.accordion-field input,
-.accordion-field textarea,
-.accordion-field select {
+.accordion-field span {
   font-size: 1.4rem;
+  color: #374151;
+}
+
+.accordion-field input,
+.accordion-field select,
+.accordion-field textarea {
+  font-size: 1.3rem;
+  color: #111827;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.accordion-field input:focus,
+.accordion-field select:focus,
+.accordion-field textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
 /* CALENDAR -------------------- */
@@ -279,19 +352,49 @@ body {
 }
 
 .calendar-day.today {
-  border: 2px solid #007bff;
   font-weight: bold;
+  box-shadow: 0 0 0 2px #007bff inset;
+}
+
+.calendar-day.outside-month {
+  color: #9ca3af;
+  background: transparent;
+  cursor: default;
+}
+
+.calendar-day.outside-month:hover {
+  background: transparent;
 }
 
 /* UPLOADS SECTION */
 
 /* Default: hide filterable categories */
 .upload-category {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.6rem;
+
+  border: none;
 
   display: none;
+}
+
+.uploads-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  padding: 0.6rem 0;
+  margin-bottom: 1.2rem;
+
+  font-size: 1.2rem;
+  color: #4b5563;
+}
+
+.uploads-filter select {
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-weight: 500;
 }
 
 /* Always visible category */
@@ -303,8 +406,18 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem 1rem;
-  background: #f7f7f7;
+
+  padding: 0.4rem 0rem;
+
+  background: transparent;
+
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0.6rem;
+}
+.upload-header h5 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #374151;
 }
 
 .upload-btn {
@@ -323,23 +436,27 @@ body {
 
 .file-list {
   list-style: none;
-  padding: 0.8rem 1rem;
+  padding: 0.6rem 0rem;
   margin: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .file-main {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr auto;
   align-items: center;
   column-gap: 1rem;
 }
 
 .file-item {
-  padding: 1rem 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
 
-  /* border: 1px solid #ddd; */
-  /* border-radius: 8px; */
-  margin-bottom: 1.2rem;
+  background: #f9fafb;
+  margin-bottom: 0;
 }
 
 .file-name {
@@ -359,6 +476,12 @@ body {
   cursor: pointer;
   font-size: 1.4rem;
   margin-left: 0.6rem;
+
+  padding: 0.3rem;
+  border-radius: 6px;
+}
+.file-actions button:hover {
+  background: #eef2ff;
 }
 
 /* MODAL VIEW FOR IMAGES */
@@ -540,7 +663,23 @@ body.modal-open {
 /* SEND REPORT MODAL */
 .send-btn {
   display: none;
-  margin-top: 0.75rem;
+  margin-top: 0.6rem;
+
+  align-self: flex-start;
+
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid #c7d2fe;
+
+  background: #eef2ff;
+  color: #1e3a8a;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.send-btn:hover {
+  background: #e0e7ff;
 }
 
 .send-modal {
@@ -585,39 +724,49 @@ body.modal-open {
 }
 
 /* SCHEDULER NOTES */
+
+.notes-header h3 {
+  color: #374151;
+  font-size: 1.5rem;
+
+  font-weight: 600;
+}
+
 .notes-list {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-right: 4px;
+  gap: 1.2rem;
+  padding-right: 6px;
 }
 
 .note-card {
-  background: #f9f9f9;
+  background: #fff;
   border-left: 4px solid #2563eb;
-  border-radius: 6px;
-  padding: 10px 12px;
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.8rem;
   min-height: 90px;
   margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .note-meta {
   display: flex;
   justify-content: space-between;
+
   font-size: 1.2rem;
-  color: #555;
+  color: #6b7280;
 }
 
 .note-content {
   font-size: 1.4rem;
-  color: #333;
+  line-height: 1.5;
+  color: #374151;
 
-  max-height: 6rem;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -627,6 +776,32 @@ body.modal-open {
 .note-content button {
   display: flex;
   align-self: flex-start;
+
+  background: transparent;
+  color: #2563eb;
+  padding: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-radius: 0;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.note-content button:hover {
+  text-decoration: underline;
+}
+
+.notes-actions button:last-child:hover {
+  background: #fee2e2;
+  color: #b42318;
+}
+
+.note-editor-text + button:hover {
+  background: #1d4ed8;
+}
+
+.note-card.expanded {
+  background: #f9fafb;
 }
 
 .note-card.expanded .note-content {
@@ -638,17 +813,42 @@ body.modal-open {
 
 .notes-actions {
   display: flex;
-  gap: 8px;
-  margin-top: auto;
-  align-self: flex-start;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+}
+
+.notes-actions select {
+  font-size: 1.25rem;
+  padding: 0.5rem 0.6rem;
+
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+
+  font-weight: 500;
 }
 
 .notes-actions button {
   font-size: 1.2rem;
-  padding: 4px 8px;
+  padding: 0.6rem 1.25rem;
+
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+
+  background: #eef2ff;
+  color: #1e3a8a;
+  font-weight: 600;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 
   width: auto;
   white-space: nowrap;
+}
+
+.notes-actions button:hover {
+  background: #e0e7ff;
 }
 
 .note-editor-text {
@@ -660,6 +860,90 @@ body.modal-open {
   font-family: inherit;
   font-size: 1.4rem;
   line-height: 1.5;
+}
+
+.note-actions {
+  display: flex;
+  gap: 0.6rem;
+
+  margin-top: 0.6rem;
+  align-items: center;
+}
+.save-inline-note {
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
+  border: none;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.save-inline-note:hover {
+  background: #1d4ed8;
+}
+.cancel-inline-note {
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+
+  background: #ffffff;
+  color: #374151;
+
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.cancel-inline-note:hover {
+  background: #f3f4f6;
+}
+.delete-note-btn {
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  border: none;
+
+  background: #eef2ff;
+  color: #1e3a8a;
+
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.delete-note-btn:hover {
+  color: #b42318;
+  background: #fecaca;
+}
+
+.toggle-note-btn {
+  background: none;
+  border: none;
+  padding: 0;
+
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2563eb;
+
+  cursor: pointer;
+}
+
+.toggle-note-btn:hover {
+  text-decoration: underline;
 }
 
 /* VIEW ALL NOTES MODAL */
@@ -709,8 +993,14 @@ body.modal-open {
 }
 
 .notes-modal-header select {
-  font-size: 1.3rem;
-  padding: 0.3rem 0.5rem;
+  font-size: 1.2rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+
+  /* cursor: pointer; */
 }
 
 /*  CALENDAR PANEL REFACTOR */
@@ -742,22 +1032,13 @@ body.modal-open {
 .location-info {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
+  /* grid-template-rows: auto auto; */
   gap: 1rem;
 }
 
-/* ZIP spans full width */
-.zip-row {
-  grid-column: 1 / 2;
-}
-
-/* Bottom row */
-.clinic-row {
-  grid-column: 1 / 2;
-}
-
-.room-row {
-  grid-column: 2 / 3;
+.location-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .info-row {
@@ -769,7 +1050,7 @@ body.modal-open {
 .info-row label {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #777;
+  color: #6b7280;
 }
 
 .info-row input,
@@ -836,14 +1117,14 @@ body.modal-open {
 .calendar-panel-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   /* border-top: 1px solid #eee; */
   padding-top: 1rem;
 }
 
 .status-badge {
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
   font-size: 1.2rem;
   font-weight: 600;
   user-select: none;
@@ -880,11 +1161,18 @@ body.modal-open {
   background: #2563eb;
   color: white;
   cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .edit-button {
-  background: #c4cfe9;
-  color: #333;
+  background: #eef2ff;
+  color: #1e40af;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .schedule-btn:hover {

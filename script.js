@@ -336,6 +336,7 @@ function renderCalendar(date) {
   //  Always render 6 weeks (42 cells)
   const totalCells = 42;
   let dayCounter = 1;
+  let nextMonthDay = 1;
 
   for (let i = 0; i < totalCells; i++) {
     const btn = document.createElement("button");
@@ -348,7 +349,7 @@ function renderCalendar(date) {
       const thisDay = new Date(year, month, dayCounter);
       thisDay.setHours(0, 0, 0, 0);
 
-      // 🔒 Disable past dates
+      //  Disable past dates
       if (thisDay < today) {
         btn.disabled = true;
         btn.classList.add("disabled");
@@ -372,10 +373,20 @@ function renderCalendar(date) {
 
       dayCounter++;
     } else {
-      // Empty placeholder cells
+      // Days from previous or next month
       btn.disabled = true;
-      btn.classList.add("empty");
-      btn.textContent = "";
+      btn.classList.add("outside-month");
+
+      if (i < firstDay) {
+        // Previous month days
+        const prevMonth = new Date(year, month, 0);
+        const prevMonthDays = prevMonth.getDate();
+        btn.textContent = prevMonthDays - (firstDay - 1 - i);
+      } else {
+        // Next month days
+        btn.textContent = nextMonthDay;
+        nextMonthDay++;
+      }
     }
 
     grid.appendChild(btn);
