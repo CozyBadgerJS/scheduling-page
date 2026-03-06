@@ -216,8 +216,8 @@
 
             <label for="sec-insurance-member-id">Member ID</label>
             <input id="sec-insurance-member-id" type="text" />
-            <label for="insurance-group-no">Group No.</label>
-            <input id="insurance-group-no" type="text" />
+            <label for="sec-insurance-group-no">Group No.</label>
+            <input id="sec-insurance-group-no" type="text" />
 
             <label>Relationship</label>
             <select
@@ -234,13 +234,13 @@
               <option value="other">Other</option>
             </select>
 
-            <label for="insurance-holder-name">Name</label>
-            <input id="insurance-holder-name" type="text" />
-            <label for="insurace-holder-lastname">Last Name</label>
-            <input id="insurace-holder-lastname" type="text" />
+            <label for="sec-insurance-holder-name">Name</label>
+            <input id="sec-insurance-holder-name" type="text" />
+            <label for="sec-insurace-holder-lastname">Last Name</label>
+            <input id="sec-insurace-holder-lastname" type="text" />
 
-            <label for="insurance-holder-dob">Date of Birth</label>
-            <input id="insurance-holder-dob" type="date" />
+            <label for="sec-insurance-holder-dob">Date of Birth</label>
+            <input id="sec-insurance-holder-dob" type="date" />
           </div>
         </fieldset>
       </form>
@@ -324,64 +324,71 @@
             </section>
 
             <section class="accordion-section">
-              <button class="accordion-header">Referring Physician</button>
+              <button class="accordion-header" id="header-physician">
+                Referring Physician
+                <span
+                  class="section-status-badge incomplete"
+                  id="badge-physician"
+                  >Incomplete</span
+                >
+              </button>
               <div class="accordion-content">
                 <div class="accordion-field">
                   <label for="ref-physician">Referring Physician</label>
-
-                  <!-- view mode -->
-                  <span>Doctor Culebras</span>
-                  <!-- edit mode -->
-                  <input id="ref-physician" type="text" />
+                  <div class="typeahead-wrapper">
+                    <input
+                      id="ref-physician"
+                      type="text"
+                      placeholder="Type doctor name..."
+                      autocomplete="off"
+                    />
+                    <ul class="typeahead-dropdown" id="physician-dropdown"></ul>
+                  </div>
                 </div>
 
                 <div class="accordion-field">
                   <label for="npi">NPI</label>
-
-                  <!-- view mode -->
-                  <span>198745632</span>
-                  <!-- edit mode -->
-                  <input id="npi" type="text" />
+                  <input id="npi" type="text" placeholder="Auto-filled" />
                 </div>
-                <div class="accordion-field">
-                  <label for="physician-office">Address</label>
 
-                  <!-- view mode -->
-                  <span>0110 Sneaky St, Miami, FL, 33101</span>
-                  <!-- edit mode -->
-                  <input id="physician-office" type="text" />
+                <div
+                  class="accordion-field"
+                  id="office-field"
+                  style="display: none"
+                >
+                  <label for="physician-office-select">Office</label>
+                  <select id="physician-office-select">
+                    <option value="">Select office</option>
+                  </select>
                 </div>
+
                 <div class="accordion-field">
                   <label for="physician-phone">Phone</label>
-
-                  <!-- view mode -->
-                  <span>888-888-8888</span>
-                  <!-- edit mode -->
                   <input
                     id="physician-phone"
                     type="tel"
-                    placeholder="888-888-8888"
+                    placeholder="Auto-filled"
                   />
                 </div>
 
                 <div class="accordion-field">
                   <label for="physician-fax">Fax</label>
-
-                  <!-- view mode -->
-                  <span>888-888-8888</span>
-                  <!-- edit mode -->
                   <input
                     id="physician-fax"
                     type="tel"
-                    placeholder="888-888-9999"
+                    placeholder="Auto-filled"
                   />
                 </div>
 
                 <div class="accordion-actions">
                   <div class="primary-actions">
-                    <button class="edit-button">Edit</button
-                    ><button class="add-dr-button">Add new</button>
-                    <button class="save-button">Save</button>
+                    <button
+                      class="save-button"
+                      id="save-physician-btn"
+                      disabled
+                    >
+                      Save
+                    </button>
                   </div>
                 </div>
               </div>
@@ -749,7 +756,10 @@
             </div>
 
             <!-- CALENDAR BODY -->
-            <div class="calendar-panel-body">
+            <div class="calendar-panel-body calendar-locked">
+              <p class="calendar-locked-message">
+                Select a clinic and room to enable scheduling
+              </p>
               <div class="calendar-container">
                 <div class="calendar">
                   <div class="calendar-header">
@@ -788,7 +798,10 @@
 
             <!-- FOOTER: STATUS + ACTION -->
             <div class="calendar-panel-footer">
-              <button class="schedule-btn">Schedule</button>
+              <button class="schedule-btn">Change Status</button>
+              <button class="schedule-btn" id="save-slot-btn" disabled>
+                Save slot
+              </button>
             </div>
           </div>
         </section>

@@ -1,3 +1,90 @@
+// DOCTOR DATABASE
+const doctors = [
+  {
+    id: "dr1",
+    name: "Salazar Slytherin",
+    npi: "1234567890",
+    offices: [
+      {
+        label: "Main Office",
+        address: "0110 Sneaky St, Miami, FL 33101",
+        phone: "305-111-2222",
+        fax: "305-111-2223",
+      },
+      {
+        label: "North Office",
+        address: "500 Brickell Ave, Miami, FL 33131",
+        phone: "305-333-4444",
+        fax: "305-333-4445",
+      },
+    ],
+  },
+  {
+    id: "dr2",
+    name: "Helga Hufflepuff",
+    npi: "0987654321",
+    offices: [
+      {
+        label: "Downtown Clinic",
+        address: "200 Flagler St, Miami, FL 33130",
+        phone: "305-555-6666",
+        fax: "305-555-6667",
+      },
+    ],
+  },
+  {
+    id: "dr3",
+    name: "Rowena Ravenclaw",
+    npi: "1122334455",
+    offices: [
+      {
+        label: "West Office",
+        address: "800 NW 7th Ave, Miami, FL 33136",
+        phone: "305-777-8888",
+        fax: "305-777-8889",
+      },
+      {
+        label: "South Office",
+        address: "1200 SW 27th Ave, Miami, FL 33145",
+        phone: "305-999-0000",
+        fax: "305-999-0001",
+      },
+    ],
+  },
+  {
+    id: "dr4",
+    name: "Godric Gryffindor",
+    npi: "2233445566",
+    offices: [
+      {
+        label: "Coral Gables Office",
+        address: "2525 Ponce de Leon Blvd, Coral Gables, FL 33134",
+        phone: "305-222-3333",
+        fax: "305-222-3334",
+      },
+    ],
+  },
+  {
+    id: "dr5",
+    name: "Poppy Pomfrey",
+    npi: "3344556677",
+    offices: [
+      {
+        label: "Kendall Office",
+        address: "11200 SW 88th St, Miami, FL 33176",
+        phone: "305-444-5555",
+        fax: "305-444-5556",
+      },
+      {
+        label: "Doral Office",
+        address: "3400 NW 87th Ave, Doral, FL 33172",
+        phone: "305-666-7777",
+        fax: "305-666-7778",
+      },
+    ],
+  },
+];
+
 // ZOOM VARIABLES
 let currentScale = 1;
 const SCALE_STEP = 0.2;
@@ -56,6 +143,24 @@ clinics.forEach((clinic) => {
 
 // UPDATE ROOM WHEN DIFFERENT CLINIC IS SELECTED
 
+// CALENDAR GATING — unlock when clinic + room are both selected
+function updateCalendarLock() {
+  const calendarBody = document.querySelector(".calendar-panel-body");
+  const lockedMessage = document.querySelector(".calendar-locked-message");
+  const clinicChosen = clinicSelect.value !== "";
+  const roomChosen = roomSelect.value !== "";
+
+  if (clinicChosen && roomChosen) {
+    calendarBody.classList.remove("calendar-locked");
+    if (lockedMessage) lockedMessage.style.display = "none";
+  } else {
+    calendarBody.classList.add("calendar-locked");
+    if (lockedMessage) lockedMessage.style.display = "block";
+  }
+}
+
+roomSelect.addEventListener("change", updateCalendarLock);
+
 clinicSelect.addEventListener("change", () => {
   const selectedClinicId = clinicSelect.value;
 
@@ -76,6 +181,8 @@ clinicSelect.addEventListener("change", () => {
     option.textContent = room;
     roomSelect.appendChild(option);
   });
+
+  updateCalendarLock();
 });
 
 // TOGGLE ACCORDEON
@@ -462,19 +569,567 @@ function updateTimeSlots(date) {
   }
 
   timeSelect.disabled = false;
+  timeSelect.addEventListener("change", updateSaveSlotBtn);
 }
 
+// SAVE SLOT GATING
+function updateSaveSlotBtn() {
+  const saveSlotBtn = document.getElementById("save-slot-btn");
+  const timeChosen = timeSelect.value !== "";
+  saveSlotBtn.disabled = !timeChosen;
+}
+
+// PHONE FORMATTING UTILITY
+
+function formatPhone(input) {
+  // Strip everything except digits
+  let digits = input.value.replace(/\D/g, "");
+
+  // Limit to 10 digits
+  if (digits.length > 10) digits = digits.slice(0, 10);
+
+  // Format as 000-000-0000
+  if (digits.length <= 3) {
+    input.value = digits;
+  } else if (digits.length <= 6) {
+    input.value = digits.slice(0, 3) + "-" + digits.slice(3);
+  } else {
+    input.value =
+      digits.slice(0, 3) + "-" + digits.slice(3, 6) + "-" + digits.slice(6);
+  }
+}
+
+// Attach formatter to main physician phone and fax fields
+["physician-phone", "physician-fax"].forEach((id) => {
+  const field = document.getElementById(id);
+  field.addEventListener("input", () => formatPhone(field));
+});
+
+// REFERRING PHYSICIAN TYPEAHEAD
+
+const physicianInput = document.getElementById("ref-physician");
+const physicianDropdown = document.getElementById("physician-dropdown");
+const officeField = document.getElementById("office-field");
+const officeSelect = document.getElementById("physician-office-select");
+
+let selectedDoctor = null;
+let isNewDoctor = false;
+
+function setPhysicianFields(editable) {
+  ["physician-phone", "physician-fax"].forEach((id) => {
+    const field = document.getElementById(id);
+    field.readOnly = !editable;
+    field.style.background = editable ? "#ffffff" : "#f3f4f6";
+    if (!editable) field.value = "";
+  });
+
+  const npi = document.getElementById("npi");
+  npi.readOnly = !editable;
+  npi.style.background = editable ? "#ffffff" : "#f3f4f6";
+}
+
+function clearPhysicianFields() {
+  // Unlock and clear the name input
+  physicianInput.readOnly = false;
+  physicianInput.style.background = "#ffffff";
+  physicianInput.value = "";
+
+  setPhysicianFields(false);
+  document.getElementById("npi").value = "";
+  officeField.style.display = "none";
+  officeSelect.innerHTML = `<option value="">Select office</option>`;
+  selectedDoctor = null;
+  isNewDoctor = false;
+  checkPhysicianComplete();
+}
+
+function fillPhysicianFields(office) {
+  document.getElementById("physician-phone").value = office.phone;
+  document.getElementById("physician-fax").value = office.fax;
+  checkPhysicianComplete();
+}
+
+function renderDropdown(query) {
+  physicianDropdown.innerHTML = "";
+
+  const matches = doctors.filter((dr) =>
+    dr.name.toLowerCase().startsWith(query.toLowerCase()),
+  );
+
+  matches.forEach((dr) => {
+    const li = document.createElement("li");
+    li.textContent = dr.name;
+    li.addEventListener("mousedown", () => {
+      selectDoctor(dr);
+    });
+    physicianDropdown.appendChild(li);
+  });
+
+  const unknownLi = document.createElement("li");
+  unknownLi.textContent = "Unknown / Will call back";
+  unknownLi.className = "typeahead-provisional";
+  unknownLi.addEventListener("mousedown", () => {
+    selectProvisional();
+  });
+  physicianDropdown.appendChild(unknownLi);
+
+  const addNewLi = document.createElement("li");
+  addNewLi.textContent = "+ Add new doctor";
+  addNewLi.className = "typeahead-special";
+  addNewLi.addEventListener("mousedown", () => {
+    selectAddNew();
+  });
+  physicianDropdown.appendChild(addNewLi);
+
+  physicianDropdown.classList.add("open");
+}
+
+function selectDoctor(dr) {
+  selectedDoctor = dr;
+  isNewDoctor = false;
+
+  // Lock name — but clicking it will unlock and re-open search
+  physicianInput.value = dr.name;
+  physicianInput.readOnly = true;
+  physicianInput.style.background = "#f3f4f6";
+
+  physicianDropdown.classList.remove("open");
+
+  // Lock phone/fax, fill NPI
+  setPhysicianFields(false);
+  document.getElementById("npi").value = dr.npi;
+
+  // Build office dropdown
+  officeSelect.innerHTML = `<option value="">Select office</option>`;
+  dr.offices.forEach((office, index) => {
+    const option = document.createElement("option");
+    option.value = index;
+    option.textContent = office.label + " — " + office.address;
+    officeSelect.appendChild(option);
+  });
+
+  // Add new office option at the bottom
+  const addOfficeOption = document.createElement("option");
+  addOfficeOption.value = "new-office";
+  addOfficeOption.textContent = "+ Add new office";
+  addOfficeOption.style.color = "#2563eb";
+  addOfficeOption.style.fontWeight = "600";
+  officeSelect.appendChild(addOfficeOption);
+
+  officeField.style.display = "block";
+
+  // Auto-select if only one real office
+  if (dr.offices.length === 1) {
+    officeSelect.value = "0";
+    fillPhysicianFields(dr.offices[0]);
+  }
+
+  checkPhysicianComplete();
+}
+
+function selectProvisional() {
+  physicianInput.value = "Unknown / Will call back";
+  physicianInput.readOnly = true;
+  physicianInput.style.background = "#f3f4f6";
+  physicianDropdown.classList.remove("open");
+  officeField.style.display = "none";
+  setPhysicianFields(false);
+  document.getElementById("npi").value = "";
+  selectedDoctor = null;
+  isNewDoctor = false;
+  checkPhysicianComplete();
+}
+
+function selectAddNew() {
+  physicianInput.value = "";
+  physicianInput.readOnly = false;
+  physicianInput.style.background = "#ffffff";
+  physicianDropdown.classList.remove("open");
+  officeField.style.display = "none";
+  selectedDoctor = null;
+  isNewDoctor = true;
+  setPhysicianFields(true);
+  document.getElementById("npi").value = "";
+  physicianInput.focus();
+  checkPhysicianComplete();
+}
+
+// Clicking the locked name field unlocks it for a new search
+physicianInput.addEventListener("click", () => {
+  if (physicianInput.readOnly) {
+    clearPhysicianFields();
+    physicianInput.focus();
+    renderDropdown("");
+  }
+});
+
+physicianInput.addEventListener("input", () => {
+  if (physicianInput.readOnly) return;
+  const query = physicianInput.value.trim();
+  if (query.length === 0) {
+    physicianDropdown.classList.remove("open");
+    return;
+  }
+  renderDropdown(query);
+});
+
+physicianInput.addEventListener("focus", () => {
+  if (physicianInput.readOnly) return;
+  if (physicianInput.value.trim().length > 0) {
+    renderDropdown(physicianInput.value.trim());
+  }
+});
+
+physicianInput.addEventListener("blur", () => {
+  setTimeout(() => {
+    physicianDropdown.classList.remove("open");
+  }, 150);
+});
+
+officeSelect.addEventListener("change", () => {
+  const index = officeSelect.value;
+
+  // No office selected — clear phone, fax, and remove new office form if open
+  if (index === "") {
+    document.getElementById("physician-phone").value = "";
+    document.getElementById("physician-fax").value = "";
+    setPhysicianFields(false);
+
+    const existingForm = document.getElementById("new-office-form");
+    if (existingForm) existingForm.remove();
+
+    const existingSaveBtn = document.getElementById("save-new-office-btn");
+    if (existingSaveBtn) existingSaveBtn.remove();
+
+    checkPhysicianComplete();
+    return;
+  }
+
+  // Add new office — show address/phone/fax inputs and a Save button
+  if (index === "new-office") {
+    document.getElementById("physician-phone").value = "";
+    document.getElementById("physician-fax").value = "";
+
+    const phone = document.getElementById("physician-phone");
+    const fax = document.getElementById("physician-fax");
+    phone.readOnly = false;
+    phone.style.background = "#ffffff";
+    fax.readOnly = false;
+    fax.style.background = "#ffffff";
+
+    // Show address field if not already there
+    let newOfficeForm = document.getElementById("new-office-form");
+    if (!newOfficeForm) {
+      newOfficeForm = document.createElement("div");
+      newOfficeForm.id = "new-office-form";
+      newOfficeForm.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        margin-top: 0.6rem;
+      `;
+
+      // Build elements directly instead of using innerHTML
+      const addressInput = document.createElement("input");
+      addressInput.id = "new-office-address";
+      addressInput.type = "text";
+      addressInput.placeholder = "Office address";
+      addressInput.style.cssText = `
+        font-size: 1.3rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: #ffffff;
+      `;
+
+      const saveOfficeBtn = document.createElement("button");
+      saveOfficeBtn.id = "save-new-office-btn";
+      saveOfficeBtn.type = "button";
+      saveOfficeBtn.disabled = true;
+      saveOfficeBtn.textContent = "Save office";
+      saveOfficeBtn.style.cssText = `
+        align-self: flex-start;
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        border: none;
+        background: #e5e7eb;
+        color: #9ca3af;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: not-allowed;
+      `;
+
+      const addressLabel = document.createElement("label");
+      addressLabel.textContent = "Office Address";
+      addressLabel.style.cssText = `
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #6b7280;
+      `;
+
+      newOfficeForm.appendChild(addressLabel);
+      newOfficeForm.appendChild(addressInput);
+
+      const phoneField = document.getElementById("physician-phone");
+      const faxField = document.getElementById("physician-fax");
+      const phoneWrapper = phoneField.closest(".accordion-field");
+      const faxWrapper = faxField.closest(".accordion-field");
+
+      function updateSaveOfficeBtn() {
+        const address = addressInput.value.trim();
+        const phone = phoneField.value.replace(/\D/g, "");
+        const fax = faxField.value.replace(/\D/g, "");
+
+        const isReady =
+          address.length > 0 && phone.length === 10 && fax.length === 10;
+
+        saveOfficeBtn.disabled = !isReady;
+        saveOfficeBtn.style.background = isReady ? "#2563eb" : "#e5e7eb";
+        saveOfficeBtn.style.color = isReady ? "#ffffff" : "#9ca3af";
+        saveOfficeBtn.style.cursor = isReady ? "pointer" : "not-allowed";
+      }
+
+      addressInput.addEventListener("input", updateSaveOfficeBtn);
+      phoneField.addEventListener("input", updateSaveOfficeBtn);
+      faxField.addEventListener("input", updateSaveOfficeBtn);
+
+      // Insert address form before phone field
+      phoneWrapper.before(newOfficeForm);
+
+      // Insert Save Office button after fax field
+      saveOfficeBtn.style.marginTop = "0.8rem";
+      faxWrapper.after(saveOfficeBtn);
+
+      saveOfficeBtn.addEventListener("click", () => {
+        const address = addressInput.value.trim();
+        const newPhone = phoneField.value.trim();
+        const newFax = faxField.value.trim();
+
+        // Build new office object
+        const newOffice = {
+          label: "New Office",
+          address,
+          phone: newPhone,
+          fax: newFax,
+        };
+
+        // Add to the doctor's offices array in memory
+        selectedDoctor.offices.push(newOffice);
+        const newIndex = selectedDoctor.offices.length - 1;
+
+        // Add to dropdown before the "+ Add new office" option
+        const addOfficeOption = officeSelect.querySelector(
+          "[value='new-office']",
+        );
+        const newOption = document.createElement("option");
+        newOption.value = newIndex;
+        newOption.textContent = newOffice.label + " — " + newOffice.address;
+        officeSelect.insertBefore(newOption, addOfficeOption);
+
+        // Select the new office
+        officeSelect.value = newIndex;
+
+        // Lock fields again
+        phoneField.readOnly = true;
+        phoneField.style.background = "#f3f4f6";
+        faxField.readOnly = true;
+        faxField.style.background = "#f3f4f6";
+
+        // Remove form and button
+        newOfficeForm.remove();
+        saveOfficeBtn.remove();
+
+        checkPhysicianComplete();
+      });
+    }
+
+    phone.focus();
+    checkPhysicianComplete();
+    return;
+  }
+
+  // Remove new office form and save button if they exist
+  const existingForm = document.getElementById("new-office-form");
+  if (existingForm) existingForm.remove();
+
+  const existingSaveBtn = document.getElementById("save-new-office-btn");
+  if (existingSaveBtn) existingSaveBtn.remove();
+
+  // Existing office selected
+  if (!selectedDoctor) return;
+  setPhysicianFields(false);
+  fillPhysicianFields(selectedDoctor.offices[index]);
+});
+
+// SECTION COMPLETION TRACKING
+
+function checkPhysicianComplete() {
+  const badge = document.getElementById("badge-physician");
+  if (!badge) return;
+
+  const isProvisional =
+    physicianInput.value.trim() === "Unknown / Will call back";
+
+  if (isProvisional) {
+    badge.textContent = "Provisional";
+    badge.className = "section-status-badge provisional";
+    const saveBtn = document.getElementById("save-physician-btn");
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.style.background = "#2563eb";
+      saveBtn.style.color = "#ffffff";
+      saveBtn.style.cursor = "pointer";
+    }
+    return;
+  }
+
+  const name = physicianInput.value.trim();
+  const npi = document.getElementById("npi").value.trim();
+  const phone = document.getElementById("physician-phone").value.trim();
+  const fax = document.getElementById("physician-fax").value.trim();
+
+  const isComplete = name && npi && phone && fax;
+  const saveBtn = document.getElementById("save-physician-btn");
+
+  if (isComplete) {
+    badge.textContent = "Complete";
+    badge.className = "section-status-badge complete";
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.style.background = "#2563eb";
+      saveBtn.style.color = "#ffffff";
+      saveBtn.style.cursor = "pointer";
+    }
+  } else {
+    badge.textContent = "Incomplete";
+    badge.className = "section-status-badge incomplete";
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.style.background = "#e5e7eb";
+      saveBtn.style.color = "#9ca3af";
+      saveBtn.style.cursor = "not-allowed";
+    }
+  }
+}
+
+// PHYSICIAN SAVE / EDIT MODE
+
+document.getElementById("save-physician-btn").addEventListener("click", () => {
+  // Collect current values
+  const name = physicianInput.value.trim();
+  const npi = document.getElementById("npi").value.trim();
+  const phone = document.getElementById("physician-phone").value.trim();
+  const fax = document.getElementById("physician-fax").value.trim();
+  const isProvisional = name === "Unknown / Will call back";
+
+  // Get the office label if one is selected
+  const officeSelectEl = document.getElementById("physician-office-select");
+  const officeLabel =
+    officeSelectEl.options[officeSelectEl.selectedIndex]?.text || "";
+
+  // Find the accordion content to work inside
+  const content = document
+    .getElementById("save-physician-btn")
+    .closest(".accordion-content");
+
+  // Hide all edit-mode fields
+  content
+    .querySelectorAll(".accordion-field, .accordion-actions")
+    .forEach((el) => {
+      el.style.display = "none";
+    });
+
+  // Build view mode block
+  const viewBlock = document.createElement("div");
+  viewBlock.className = "physician-view-mode";
+  viewBlock.id = "physician-view-block";
+
+  function makeViewField(labelText, valueText) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "physician-view-field";
+
+    const lbl = document.createElement("label");
+    lbl.textContent = labelText;
+
+    const val = document.createElement("span");
+    val.textContent = valueText;
+
+    wrapper.appendChild(lbl);
+    wrapper.appendChild(val);
+    return wrapper;
+  }
+
+  viewBlock.appendChild(makeViewField("Referring Physician", name));
+  if (!isProvisional) {
+    viewBlock.appendChild(makeViewField("NPI", npi));
+    viewBlock.appendChild(makeViewField("Office", officeLabel));
+    viewBlock.appendChild(makeViewField("Phone", phone));
+    viewBlock.appendChild(makeViewField("Fax", fax));
+  }
+
+  // Edit button
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.className = "edit-button";
+  editBtn.id = "edit-physician-btn";
+
+  const actionsWrapper = document.createElement("div");
+  actionsWrapper.className = "accordion-actions";
+  const primaryWrapper = document.createElement("div");
+  primaryWrapper.className = "primary-actions";
+  primaryWrapper.appendChild(editBtn);
+  actionsWrapper.appendChild(primaryWrapper);
+
+  viewBlock.appendChild(actionsWrapper);
+  content.appendChild(viewBlock);
+
+  // EDIT button — restore edit mode
+  editBtn.addEventListener("click", () => {
+    // Remove view block
+    viewBlock.remove();
+
+    // Restore all edit-mode fields
+    content
+      .querySelectorAll(".accordion-field, .accordion-actions")
+      .forEach((el) => {
+        el.style.display = "";
+      });
+
+    // Restore office field visibility if a doctor was selected
+    if (selectedDoctor) {
+      document.getElementById("office-field").style.display = "block";
+    }
+  });
+});
+
 // UPLOADS SECTION
+
+function isSingleFileCategory(category) {
+  // Solo limitar uploads en la sección "Uploads"
+  // Las categorías de Report / Images tienen data-report-type
+  return !category.dataset.reportType;
+}
+
 document
   .querySelectorAll('.upload-category input[type="file"]')
   .forEach((input) => {
     input.addEventListener("change", () => {
-      const fileList = input
-        .closest(".upload-category")
+      const category = input.closest(".upload-category");
+      const fileList = category.querySelector(".file-list");
+      const uploadBtn = category.querySelector(".upload-btn");
 
-        .querySelector(".file-list");
+      const singleFileOnly = isSingleFileCategory(category);
+
+      // 🚫 If only one file allowed and one already exists
+      if (singleFileOnly && fileList.children.length > 0) {
+        input.value = "";
+        return;
+      }
 
       for (const file of input.files) {
+        // Safety check (in case multiple files were selected)
+        if (singleFileOnly && fileList.children.length > 0) break;
+
         const now = new Date();
         const formattedDate = now.toLocaleDateString();
         const formattedTime = now.toLocaleTimeString([], {
@@ -484,38 +1139,44 @@ document
 
         const li = document.createElement("li");
         li.className = "file-item";
-
-        // store file reference for later (view/download)
         li.file = file;
 
         li.innerHTML = `
-          <div class="file-main">
-            <span class="file-name">${file.name}</span>
+      <div class="file-main">
+        <span class="file-name">${file.name}</span>
 
-            <div class="file-actions">
-              <button class="view-btn" title="View">
-                <ion-icon name="eye-outline"></ion-icon>
-              </button>
-              <button class="download-btn" title="Download">
-                <ion-icon name="download-outline"></ion-icon>
-              </button>
-              <button class="delete-btn" title="Delete">
-                <ion-icon name="trash-outline"></ion-icon>
-              </button>
-            </div>
-          </div>
+        <div class="file-actions">
+          <button class="view-btn" title="View">
+            <ion-icon name="eye-outline"></ion-icon>
+          </button>
+          <button class="download-btn" title="Download">
+            <ion-icon name="download-outline"></ion-icon>
+          </button>
+          <button class="delete-btn" title="Delete">
+            <ion-icon name="trash-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
 
-          <div class="file-uploader">
-            Uploaded by Cozy Badger on ${formattedDate} at ${formattedTime}
-          </div>
-        `;
+      <div class="file-uploader">
+        Uploaded by Cozy Badger on ${formattedDate} at ${formattedTime}
+      </div>
+    `;
 
         fileList.appendChild(li);
-        const category = input.closest(".upload-category");
-        const sendBtn = category.querySelector(".send-btn");
-        if (sendBtn) {
-          sendBtn.style.display = "inline-block";
-        }
+      }
+
+      // 🚫 Disable upload button if single-file category now has a file
+      if (singleFileOnly) {
+        uploadBtn.style.display =
+          fileList.children.length > 0 ? "none" : "inline-flex";
+      }
+
+      //  Show send button if files exist (Report section only)
+      const sendBtn = category.querySelector(".send-btn");
+      if (sendBtn) {
+        sendBtn.style.display =
+          fileList.children.length > 0 ? "inline-block" : "none";
       }
 
       input.value = "";
@@ -756,6 +1417,14 @@ confirmDeleteBtn.addEventListener("click", () => {
     sendBtn.style.display = "none";
   }
 
+  // ✅ Restore upload button if this is a single-file Upload category
+  if (isSingleFileCategory(category)) {
+    const uploadBtn = category.querySelector(".upload-btn");
+    if (uploadBtn && fileList.children.length === 0) {
+      uploadBtn.style.display = "inline-flex";
+    }
+  }
+
   deleteModal.classList.remove("active");
 });
 
@@ -772,16 +1441,46 @@ const categories = document.querySelectorAll(".upload-category[data-type]");
 filterSelect.addEventListener("change", () => {
   const value = filterSelect.value;
 
-  categories.forEach((category) => {
-    if (value === "all") {
+  const container = filterSelect.closest(".accordion-content");
+  const actionsEl = container.querySelector(".accordion-actions");
+
+  const allCategories = Array.from(
+    container.querySelectorAll(".upload-category[data-type]"),
+  );
+
+  if (value === "all") {
+    const withFiles = [];
+    const withoutFiles = [];
+
+    allCategories.forEach((category) => {
+      const fileList = category.querySelector(".file-list");
+
       category.style.display = "block";
-    } else if (category.dataset.type === value) {
+
+      if (fileList && fileList.children.length > 0) {
+        withFiles.push(category);
+      } else {
+        withoutFiles.push(category);
+      }
+    });
+
+    [...withFiles, ...withoutFiles].forEach((category) => {
+      container.insertBefore(category, actionsEl);
+    });
+
+    return;
+  }
+
+  // Normal filtering behavior
+  allCategories.forEach((category) => {
+    if (category.dataset.type === value) {
       category.style.display = "block";
     } else {
       category.style.display = "none";
     }
   });
 });
+
 // SEND REPORT MODAL
 const sendModal = document.getElementById("sendModal");
 const sendFaxInput = document.getElementById("sendFax");

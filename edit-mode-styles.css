@@ -182,7 +182,31 @@ body {
   flex-direction: column;
   align-items: flex-end;
   gap: 0.6rem;
-  margin-top: 1.2rem;
+  /* margin-top: 1.2rem; */
+}
+
+.physician-view-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.physician-view-field {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 0.8rem;
+}
+
+.physician-view-field label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.physician-view-field span {
+  font-size: 1.4rem;
+  color: #111827;
 }
 
 /* BUTTONS
@@ -193,7 +217,7 @@ Edit + Save row */
 
   justify-content: flex-end;
 
-  margin-top: 0.8rem;
+  /* margin-top: 0.8rem; */
 }
 
 /* Secondary action (Add / Change Physician) */
@@ -227,6 +251,31 @@ Edit + Save row */
   font-weight: 600;
   text-align: left;
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-status-badge {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+}
+
+.section-status-badge.complete {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.section-status-badge.provisional {
+  background: #fff3cd;
+  color: #8a6d1d;
+}
+
+.section-status-badge.incomplete {
+  background: #fee2e2;
+  color: #b42318;
 }
 
 .accordion-content {
@@ -267,11 +316,63 @@ Edit + Save row */
   margin-bottom: 1.2rem;
 }
 
+#new-office-form {
+  margin-bottom: 0.8rem;
+}
+
 .accordion-field label {
   font-size: 1.1rem;
   font-weight: 600;
   color: #6b7280;
   margin-bottom: 0.4rem;
+}
+.typeahead-wrapper {
+  position: relative;
+}
+
+.typeahead-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  margin: 0;
+  padding: 0.4rem 0;
+  z-index: 100;
+  display: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.typeahead-dropdown.open {
+  display: block;
+}
+
+.typeahead-dropdown li {
+  padding: 0.7rem 1rem;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #374151;
+}
+
+.typeahead-dropdown li:hover {
+  background: #eef2ff;
+}
+
+.typeahead-dropdown li.typeahead-special {
+  color: #2563eb;
+  font-weight: 600;
+  border-top: 1px solid #e5e7eb;
+}
+
+.typeahead-dropdown li.typeahead-provisional {
+  color: #8a6d1d;
+  font-weight: 600;
+  border-top: 1px solid #e5e7eb;
 }
 
 .accordion-field span {
@@ -1067,6 +1168,13 @@ body.modal-open {
   text-overflow: ellipsis;
 }
 
+.accordion-field select {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
 /* CALENDAR BODY */
 .calendar-panel-body {
   display: flex;
@@ -1074,6 +1182,41 @@ body.modal-open {
   gap: 1.2rem;
   width: 100%;
   align-items: center;
+}
+
+.calendar-panel-body {
+  position: relative;
+}
+
+.calendar-panel-body.calendar-locked {
+  pointer-events: none;
+}
+
+.calendar-panel-body.calendar-locked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  z-index: 1;
+}
+
+.calendar-locked-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  font-size: 1.2rem;
+  color: #374151;
+  text-align: center;
+  font-style: italic;
+  background: white;
+  padding: 15.6rem 3.2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .time-selection label {
@@ -1117,7 +1260,7 @@ body.modal-open {
 .calendar-panel-footer {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
   /* border-top: 1px solid #eee; */
   padding-top: 1rem;
 }
@@ -1177,6 +1320,12 @@ body.modal-open {
 
 .schedule-btn:hover {
   background: #1d4ed8;
+}
+
+.schedule-btn:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
 }
 
 /*   CALENDAR VISUAL STYLING  */
