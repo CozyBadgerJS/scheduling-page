@@ -389,6 +389,7 @@ Edit + Save row */
   border-radius: 8px;
   border: 1px solid #d1d5db;
   background: #ffffff;
+  width: 100%;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
@@ -465,6 +466,53 @@ Edit + Save row */
 
 .calendar-day.outside-month:hover {
   background: transparent;
+}
+
+/* INSURANCE SUBSECTIONS */
+
+.insurance-subsection-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 1.2rem;
+}
+
+.insurance-divider {
+  border: none;
+  border-top: 2px solid #e5e7eb;
+  margin: 1.6rem 0;
+}
+
+.secondary-insurance-wrapper {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s ease;
+}
+
+.secondary-insurance-wrapper.visible {
+  max-height: 800px;
+}
+
+.insurance-subsection {
+  display: flex;
+  flex-direction: column;
+}
+
+.add-secondary-btn {
+  align-self: flex-start;
+  margin-top: 1.2rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: 1px dashed #c7d2fe;
+  background: transparent;
+  color: #2563eb;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-secondary-btn:hover {
+  background: #eef2ff;
 }
 
 /* UPLOADS SECTION */
@@ -1325,7 +1373,7 @@ body.modal-open {
 .schedule-btn:disabled {
   background: #e5e7eb;
   color: #9ca3af;
-  cursor: not-allowed;
+  cursor: auto;
 }
 
 /*   CALENDAR VISUAL STYLING  */

@@ -1,3 +1,224 @@
+// SCREENING QUESTIONS DATABASE
+const screeningQuestions = {
+  mammogram: [
+    "First time having a mammogram?",
+    "When was your last mammogram?",
+    "Where was your last mammogram?",
+    "Breast implants?",
+    "Any symptoms of pain, lumps or discharge on breasts?",
+    "Any family history of breast cancer?",
+    "Weight",
+    "Height",
+  ],
+  xray: [
+    "Have you had any previous x-rays or imaging of this area?",
+    "Are you pregnant or possibly pregnant?",
+    "Weight",
+    "Height",
+  ],
+  bonedensity: [
+    "First time having a bone density scan?",
+    "Are you currently taking any calcium supplements or medications for bone loss?",
+    "Have you ever been diagnosed with osteoporosis or osteopenia?",
+    "Weight",
+    "Height",
+  ],
+  mri: [
+    "First time having an MRI?",
+    "Do you have any metal implants, pacemaker, or medical devices?",
+    "Do you have claustrophobia?",
+    "Are you able to lie still for 30–60 minutes?",
+    "Are you pregnant or possibly pregnant?",
+    "Are you allergic to contrast?",
+    "Weight",
+    "Height",
+  ],
+  ctscan: [
+    "First time having a CT scan?",
+    "Do you have any allergies, especially to contrast dye or iodine?",
+    "Do you have kidney disease or diabetes?",
+    "Have you had a CT scan with contrast before? Any reactions?",
+    "Do you have any metal implants or hardware?",
+    "Are you pregnant or possibly pregnant?",
+    "Weight",
+    "Height",
+  ],
+  fluoroscopy: [
+    "First time having a fluoroscopy?",
+    "Do you have any allergies to contrast dye or barium?",
+    "Are you able to follow instructions during the exam (swallow, hold breath, etc.)?",
+    "When was your last meal or drink?",
+    "Are you pregnant or possibly pregnant?",
+    "Weight",
+    "Height",
+  ],
+  nuclearmedicine: [
+    "Have you had any nuclear medicine scans before?",
+    "Do you have any allergies to medications or contrast agents?",
+    "Are you diabetic? If so, what medications are you taking?",
+    "Have you had any recent imaging with contrast in the last 48 hours?",
+    "Are you pregnant or possibly pregnant?",
+    "Are you currently breastfeeding?",
+    "Weight",
+    "Height",
+  ],
+};
+
+// RENDER SCREENING QUESTIONS
+function renderScreeningQuestions(examType) {
+  const content = document.getElementById("screening-content");
+  content.innerHTML = "";
+
+  const questions = screeningQuestions[examType];
+  if (!questions) return;
+
+  questions.forEach((question, index) => {
+    const field = document.createElement("div");
+    field.className = "accordion-field";
+
+    const label = document.createElement("label");
+    label.setAttribute("for", `sq-${index}`);
+    label.textContent = question;
+
+    const input = document.createElement("input");
+    input.id = `sq-${index}`;
+    input.type = "text";
+    input.dataset.sqIndex = index;
+
+    input.addEventListener("input", checkScreeningComplete);
+
+    field.appendChild(label);
+    field.appendChild(input);
+    content.appendChild(field);
+  });
+
+  // Add actions row with Save button (disabled by default)
+  const actions = document.createElement("div");
+  actions.className = "accordion-actions";
+  actions.innerHTML = `
+    <div class="primary-actions">
+      <button class="save-button" id="save-screening-btn" disabled
+        style="background:#e5e7eb; color:#9ca3af; cursor: auto;">
+        Save
+      </button>
+    </div>
+  `;
+  content.appendChild(actions);
+
+  // Store which exam is currently loaded
+  content.dataset.currentExam = examType;
+
+  // Attach save handler
+  document
+    .getElementById("save-screening-btn")
+    .addEventListener("click", saveScreeningQuestions);
+}
+
+// SAVE SCREENING QUESTIONS
+function saveScreeningQuestions() {
+  const content = document.getElementById("screening-content");
+  const inputs = content.querySelectorAll("input[data-sq-index]");
+  const badge = document.getElementById("badge-screening");
+
+  // Collect answers
+  const answers = [];
+  inputs.forEach((input) => {
+    answers.push({
+      question: input.previousElementSibling.textContent,
+      answer: input.value.trim(),
+    });
+  });
+
+  // Clear content
+  content.innerHTML = "";
+
+  // Build summary view
+  const summary = document.createElement("div");
+  summary.className = "screening-summary";
+  summary.id = "screening-summary";
+
+  answers.forEach(({ question, answer }) => {
+    const field = document.createElement("div");
+    field.className = "physician-view-field";
+
+    const lbl = document.createElement("label");
+    lbl.textContent = question;
+
+    const val = document.createElement("span");
+    val.textContent = answer;
+
+    field.appendChild(lbl);
+    field.appendChild(val);
+    summary.appendChild(field);
+  });
+
+  // Edit button
+  const actions = document.createElement("div");
+  actions.className = "accordion-actions";
+  actions.innerHTML = `
+    <div class="primary-actions">
+      <button class="edit-button" id="edit-screening-btn">Edit</button>
+    </div>
+  `;
+
+  summary.appendChild(actions);
+  content.appendChild(summary);
+
+  // Update badge
+  badge.textContent = "Complete";
+  badge.className = "section-status-badge complete";
+
+  // Edit button — restore inputs with saved answers
+  document
+    .getElementById("edit-screening-btn")
+    .addEventListener("click", () => {
+      const currentExam = content.dataset.currentExam || "mammogram";
+      renderScreeningQuestions(currentExam);
+
+      // Re-fill answers
+      const newInputs = content.querySelectorAll("input[data-sq-index]");
+      newInputs.forEach((input, i) => {
+        input.value = answers[i]?.answer || "";
+      });
+
+      // Re-check completion so Save button state is correct
+      checkScreeningComplete();
+    });
+}
+
+// CHECK IF ALL SCREENING QUESTIONS ARE ANSWERED
+function checkScreeningComplete() {
+  const content = document.getElementById("screening-content");
+  const inputs = content.querySelectorAll("input[data-sq-index]");
+  const saveBtn = document.getElementById("save-screening-btn");
+  const badge = document.getElementById("badge-screening");
+
+  if (!saveBtn) return;
+
+  const allFilled = Array.from(inputs).every(
+    (input) => input.value.trim() !== "",
+  );
+
+  if (allFilled) {
+    saveBtn.disabled = false;
+    saveBtn.style.background = "#2563eb";
+    saveBtn.style.color = "#ffffff";
+    saveBtn.style.cursor = "pointer";
+    badge.textContent = "Complete";
+    badge.className = "section-status-badge complete";
+  } else {
+    saveBtn.disabled = true;
+    saveBtn.style.background = "#e5e7eb";
+    saveBtn.style.color = "#9ca3af";
+    saveBtn.style.cursor = "not-allowed";
+    badge.textContent = "Incomplete";
+    badge.className = "section-status-badge incomplete";
+  }
+}
+
+// For now, load mammogram questions by default
+renderScreeningQuestions("mammogram");
+
 // DOCTOR DATABASE
 const doctors = [
   {
@@ -748,15 +969,16 @@ function selectAddNew() {
   officeField.style.display = "none";
   selectedDoctor = null;
   isNewDoctor = true;
-  setPhysicianFields(true);
+  setPhysicianFields(false);
   document.getElementById("npi").value = "";
-  physicianInput.focus();
   checkPhysicianComplete();
+  buildNewDoctorForm();
 }
-
 // Clicking the locked name field unlocks it for a new search
 physicianInput.addEventListener("click", () => {
   if (physicianInput.readOnly) {
+    // Don't unlock if the new doctor form is open
+    if (physicianInput.dataset.formOpen === "true") return;
     clearPhysicianFields();
     physicianInput.focus();
     renderDropdown("");
@@ -905,41 +1127,46 @@ officeSelect.addEventListener("change", () => {
         const newPhone = phoneField.value.trim();
         const newFax = faxField.value.trim();
 
-        // Build new office object
-        const newOffice = {
-          label: "New Office",
-          address,
-          phone: newPhone,
-          fax: newFax,
-        };
+        const summary =
+          `Address: ${address}\n` + `Phone: ${newPhone}\n` + `Fax: ${newFax}`;
 
-        // Add to the doctor's offices array in memory
-        selectedDoctor.offices.push(newOffice);
-        const newIndex = selectedDoctor.offices.length - 1;
+        showConfirmModal("Add new office?", summary, () => {
+          // Build new office object
+          const newOffice = {
+            label: "New Office",
+            address,
+            phone: newPhone,
+            fax: newFax,
+          };
 
-        // Add to dropdown before the "+ Add new office" option
-        const addOfficeOption = officeSelect.querySelector(
-          "[value='new-office']",
-        );
-        const newOption = document.createElement("option");
-        newOption.value = newIndex;
-        newOption.textContent = newOffice.label + " — " + newOffice.address;
-        officeSelect.insertBefore(newOption, addOfficeOption);
+          // Add to the doctor's offices array in memory
+          selectedDoctor.offices.push(newOffice);
+          const newIndex = selectedDoctor.offices.length - 1;
 
-        // Select the new office
-        officeSelect.value = newIndex;
+          // Add to dropdown before the "+ Add new office" option
+          const addOfficeOption = officeSelect.querySelector(
+            "[value='new-office']",
+          );
+          const newOption = document.createElement("option");
+          newOption.value = newIndex;
+          newOption.textContent = newOffice.label + " — " + newOffice.address;
+          officeSelect.insertBefore(newOption, addOfficeOption);
 
-        // Lock fields again
-        phoneField.readOnly = true;
-        phoneField.style.background = "#f3f4f6";
-        faxField.readOnly = true;
-        faxField.style.background = "#f3f4f6";
+          // Select the new office
+          officeSelect.value = newIndex;
 
-        // Remove form and button
-        newOfficeForm.remove();
-        saveOfficeBtn.remove();
+          // Lock fields again
+          phoneField.readOnly = true;
+          phoneField.style.background = "#f3f4f6";
+          faxField.readOnly = true;
+          faxField.style.background = "#f3f4f6";
 
-        checkPhysicianComplete();
+          // Remove form and button
+          newOfficeForm.remove();
+          saveOfficeBtn.remove();
+
+          checkPhysicianComplete();
+        }); // end showConfirmModal
       });
     }
 
@@ -1011,6 +1238,953 @@ function checkPhysicianComplete() {
     }
   }
 }
+
+// CONFIRMATION MODAL UTILITY
+
+function showConfirmModal(title, body, onConfirm) {
+  const modal = document.getElementById("confirmModal");
+  document.getElementById("confirmModalTitle").textContent = title;
+  // Convert newlines to <br> so each field appears on its own line
+  document.getElementById("confirmModalBody").innerHTML = body
+    .split("\n")
+    .map(
+      (line) =>
+        `<span style="display:block; padding: 0.15rem 0;">${line}</span>`,
+    )
+    .join("");
+  modal.classList.add("active");
+  document.body.classList.add("modal-open");
+
+  const confirmBtn = document.getElementById("confirmModalConfirm");
+  const cancelBtn = document.getElementById("confirmModalCancel");
+
+  // Clone buttons to remove any previous listeners
+  const newConfirm = confirmBtn.cloneNode(true);
+  const newCancel = cancelBtn.cloneNode(true);
+  confirmBtn.replaceWith(newConfirm);
+  cancelBtn.replaceWith(newCancel);
+
+  newConfirm.addEventListener("click", () => {
+    modal.classList.remove("active");
+    document.body.classList.remove("modal-open");
+    onConfirm();
+  });
+
+  newCancel.addEventListener("click", () => {
+    modal.classList.remove("active");
+    document.body.classList.remove("modal-open");
+  });
+}
+
+// NEW DOCTOR FORM
+
+function buildNewDoctorForm() {
+  // Remove any existing form first
+  const existing = document.getElementById("new-doctor-form");
+  if (existing) existing.remove();
+
+  const content = document
+    .getElementById("save-physician-btn")
+    .closest(".accordion-content");
+
+  // Disable main Save button while form is open
+  const saveBtn = document.getElementById("save-physician-btn");
+  saveBtn.disabled = true;
+  saveBtn.style.background = "#e5e7eb";
+  saveBtn.style.color = "#9ca3af";
+  saveBtn.style.cursor = "not-allowed";
+
+  // Build the form container
+  const form = document.createElement("div");
+  form.id = "new-doctor-form";
+  form.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 0.8rem;
+    padding: 1.2rem;
+    background: #f9fafb;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+  `;
+
+  function makeField(labelText, inputId, type = "text", placeholder = "") {
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText = "display:flex; flex-direction:column; gap:0.4rem;";
+
+    const lbl = document.createElement("label");
+    lbl.textContent = labelText;
+    lbl.style.cssText = "font-size:1.1rem; font-weight:600; color:#6b7280;";
+
+    const input = document.createElement("input");
+    input.id = inputId;
+    input.type = type;
+    input.placeholder = placeholder;
+    input.style.cssText = `
+      font-size: 1.3rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+    `;
+
+    wrapper.appendChild(lbl);
+    wrapper.appendChild(input);
+    return { wrapper, input };
+  }
+
+  const { wrapper: nameWrapper, input: nameInput } = makeField(
+    "Doctor Name",
+    "new-dr-name",
+    "text",
+    "Full name",
+  );
+  const { wrapper: npiWrapper, input: npiInput } = makeField(
+    "NPI",
+    "new-dr-npi",
+    "text",
+    "10-digit NPI",
+  );
+  const { wrapper: addressWrapper, input: addressInput } = makeField(
+    "Office Address",
+    "new-dr-address",
+    "text",
+    "Full address",
+  );
+  const { wrapper: phoneWrapper, input: phoneInput } = makeField(
+    "Phone",
+    "new-dr-phone",
+    "tel",
+    "000-000-0000",
+  );
+  const { wrapper: faxWrapper, input: faxInput } = makeField(
+    "Fax",
+    "new-dr-fax",
+    "tel",
+    "000-000-0000",
+  );
+
+  // Attach phone formatter
+  phoneInput.addEventListener("input", () => formatPhone(phoneInput));
+  faxInput.addEventListener("input", () => formatPhone(faxInput));
+
+  // Save Doctor button (disabled until all fields filled)
+  const saveDrBtn = document.createElement("button");
+  saveDrBtn.type = "button";
+  saveDrBtn.textContent = "Save Doctor";
+  saveDrBtn.disabled = true;
+  saveDrBtn.style.cssText = `
+    align-self: flex-start;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    background: #e5e7eb;
+    color: #9ca3af;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: not-allowed;
+  `;
+
+  // Cancel button
+  const cancelDrBtn = document.createElement("button");
+  cancelDrBtn.type = "button";
+  cancelDrBtn.textContent = "Cancel";
+  cancelDrBtn.style.cssText = `
+    align-self: flex-start;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+  `;
+
+  const btnRow = document.createElement("div");
+  btnRow.style.cssText = "display:flex; gap:0.6rem; margin-top:0.4rem;";
+  btnRow.appendChild(saveDrBtn);
+  btnRow.appendChild(cancelDrBtn);
+
+  form.appendChild(nameWrapper);
+  form.appendChild(npiWrapper);
+  form.appendChild(addressWrapper);
+  form.appendChild(phoneWrapper);
+  form.appendChild(faxWrapper);
+  form.appendChild(btnRow);
+
+  // Lock the typeahead input while form is open
+  physicianInput.readOnly = true;
+  physicianInput.style.background = "#f3f4f6";
+  physicianInput.placeholder = "Filling in new doctor...";
+  physicianInput.style.cursor = "not-allowed";
+  physicianInput.style.opacity = "0.6";
+
+  // Store flag to block dropdown interactions
+  physicianInput.dataset.formOpen = "true";
+
+  // Hide all other fields except the typeahead
+  const typeaheadField = physicianInput.closest(".accordion-field");
+  content
+    .querySelectorAll(".accordion-field, .accordion-actions")
+    .forEach((el) => {
+      if (el !== typeaheadField) el.style.display = "none";
+    });
+
+  // Insert form after the typeahead field
+  typeaheadField.after(form);
+
+  // Validation — enable Save Doctor only when all fields are filled
+  function updateSaveDrBtn() {
+    const name = nameInput.value.trim();
+    const npi = npiInput.value.trim();
+    const address = addressInput.value.trim();
+    const phone = phoneInput.value.replace(/\D/g, "");
+    const fax = faxInput.value.replace(/\D/g, "");
+
+    const isReady =
+      name.length > 0 &&
+      npi.length > 0 &&
+      address.length > 0 &&
+      phone.length === 10 &&
+      fax.length === 10;
+
+    saveDrBtn.disabled = !isReady;
+    saveDrBtn.style.background = isReady ? "#2563eb" : "#e5e7eb";
+    saveDrBtn.style.color = isReady ? "#ffffff" : "#9ca3af";
+    saveDrBtn.style.cursor = isReady ? "pointer" : "not-allowed";
+  }
+
+  [nameInput, npiInput, addressInput, phoneInput, faxInput].forEach((inp) =>
+    inp.addEventListener("input", updateSaveDrBtn),
+  );
+
+  // Cancel — remove form, restore fields, unlock typeahead
+  cancelDrBtn.addEventListener("click", () => {
+    form.remove();
+
+    // Restore all hidden fields
+    content
+      .querySelectorAll(".accordion-field, .accordion-actions")
+      .forEach((el) => {
+        el.style.display = "";
+      });
+
+    // Re-hide office field until a doctor is selected
+    document.getElementById("office-field").style.display = "none";
+
+    physicianInput.readOnly = false;
+    physicianInput.style.background = "#ffffff";
+    physicianInput.placeholder = "Type doctor name...";
+    physicianInput.style.cursor = "";
+    physicianInput.style.opacity = "";
+    physicianInput.value = "";
+    delete physicianInput.dataset.formOpen;
+    checkPhysicianComplete();
+  });
+
+  // Save Doctor — show confirmation modal first
+  saveDrBtn.addEventListener("click", () => {
+    const name = nameInput.value.trim();
+    const npi = npiInput.value.trim();
+    const address = addressInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const fax = faxInput.value.trim();
+
+    const summary =
+      `Name: ${name}\n` +
+      `NPI: ${npi}\n` +
+      `Address: ${address}\n` +
+      `Phone: ${phone}\n` +
+      `Fax: ${fax}`;
+
+    showConfirmModal("Add new doctor?", summary, () => {
+      // Build new doctor object
+      const newDoctor = {
+        id: "dr-new-" + Date.now(),
+        name,
+        npi,
+        offices: [{ label: "Main Office", address, phone, fax }],
+      };
+
+      // Add to in-memory database
+      doctors.push(newDoctor);
+
+      // Restore all hidden fields
+      content
+        .querySelectorAll(".accordion-field, .accordion-actions")
+        .forEach((el) => {
+          el.style.display = "";
+        });
+
+      // Re-hide office field — selectDoctor will show it when needed
+      document.getElementById("office-field").style.display = "none";
+
+      // Unlock typeahead, remove form, select new doctor
+      physicianInput.readOnly = false;
+      physicianInput.style.background = "#ffffff";
+      physicianInput.placeholder = "Type doctor name...";
+      physicianInput.style.cursor = "";
+      physicianInput.style.opacity = "";
+      delete physicianInput.dataset.formOpen;
+      form.remove();
+      selectDoctor(newDoctor);
+    });
+  });
+
+  nameInput.focus();
+}
+
+// INSURANCE INFO — COMPLETION CHECK & SAVE/EDIT
+
+function checkPrimaryInsuranceComplete() {
+  const carrier = document.getElementById("prim-carrier").value;
+  const memberId = document.getElementById("prim-member-id").value.trim();
+  const relationship = document.getElementById("prim-relationship").value;
+  const firstname = document
+    .getElementById("prim-holder-firstname")
+    .value.trim();
+  const lastname = document.getElementById("prim-holder-lastname").value.trim();
+  const dob = document.getElementById("prim-holder-dob").value;
+  const saveBtn = document.getElementById("save-primary-insurance-btn");
+
+  const isProvisional = carrier === "unknown";
+  const isComplete =
+    carrier &&
+    memberId &&
+    relationship &&
+    firstname &&
+    lastname &&
+    dob.length === 10 &&
+    !dob.startsWith("000") &&
+    new Date(dob).getFullYear() > 999;
+
+  if (isProvisional || isComplete) {
+    saveBtn.disabled = false;
+    saveBtn.style.background = "#2563eb";
+    saveBtn.style.color = "#ffffff";
+    saveBtn.style.cursor = "pointer";
+  } else {
+    saveBtn.disabled = true;
+    saveBtn.style.background = "#e5e7eb";
+    saveBtn.style.color = "#9ca3af";
+    saveBtn.style.cursor = "not-allowed";
+  }
+}
+
+// Attach listeners to all primary insurance fields
+["prim-carrier", "prim-relationship"].forEach((id) => {
+  document
+    .getElementById(id)
+    .addEventListener("change", checkPrimaryInsuranceComplete);
+});
+[
+  "prim-member-id",
+  "prim-holder-firstname",
+  "prim-holder-lastname",
+  "prim-holder-dob",
+].forEach((id) => {
+  document
+    .getElementById(id)
+    .addEventListener("input", checkPrimaryInsuranceComplete);
+});
+
+function applyProvisionalToggle() {
+  const isProvisional =
+    document.getElementById("prim-carrier").value === "unknown";
+  const fieldsToToggle = [
+    "prim-member-id",
+    "prim-relationship",
+    "prim-holder-firstname",
+    "prim-holder-lastname",
+    "prim-holder-dob",
+  ];
+
+  fieldsToToggle.forEach((id) => {
+    const field = document.getElementById(id);
+    field.disabled = isProvisional;
+    field.style.background = isProvisional ? "#f3f4f6" : "#ffffff";
+    field.style.color = isProvisional ? "#9ca3af" : "#111827";
+    if (isProvisional) field.value = "";
+  });
+}
+
+document
+  .getElementById("prim-carrier")
+  .addEventListener("change", applyProvisionalToggle);
+
+function checkSecondaryInsuranceComplete() {
+  const carrier = document.getElementById("sec-carrier").value;
+  const memberId = document.getElementById("sec-member-id").value.trim();
+  const relationship = document.getElementById("sec-relationship").value;
+  const firstname = document
+    .getElementById("sec-holder-firstname")
+    .value.trim();
+  const lastname = document.getElementById("sec-holder-lastname").value.trim();
+  const dob = document.getElementById("sec-holder-dob").value;
+  const saveBtn = document.getElementById("save-secondary-insurance-btn");
+
+  const isComplete =
+    carrier &&
+    memberId &&
+    relationship &&
+    firstname &&
+    lastname &&
+    dob.length === 10 &&
+    !dob.startsWith("000") &&
+    new Date(dob).getFullYear() > 999;
+
+  if (isComplete) {
+    saveBtn.disabled = false;
+    saveBtn.style.background = "#2563eb";
+    saveBtn.style.color = "#ffffff";
+    saveBtn.style.cursor = "pointer";
+  } else {
+    saveBtn.disabled = true;
+    saveBtn.style.background = "#e5e7eb";
+    saveBtn.style.color = "#9ca3af";
+    saveBtn.style.cursor = "not-allowed";
+  }
+}
+
+// Attach listeners to all secondary insurance fields
+["sec-carrier", "sec-relationship"].forEach((id) => {
+  document
+    .getElementById(id)
+    .addEventListener("change", checkSecondaryInsuranceComplete);
+});
+[
+  "sec-member-id",
+  "sec-holder-firstname",
+  "sec-holder-lastname",
+  "sec-holder-dob",
+].forEach((id) => {
+  document
+    .getElementById(id)
+    .addEventListener("input", checkSecondaryInsuranceComplete);
+});
+
+// SAVE PRIMARY INSURANCE
+function savePrimaryInsurance() {
+  const carrier = document.getElementById("prim-carrier");
+  const memberId = document.getElementById("prim-member-id");
+  const relationship = document.getElementById("prim-relationship");
+  const firstname = document.getElementById("prim-holder-firstname");
+  const lastname = document.getElementById("prim-holder-lastname");
+  const dob = document.getElementById("prim-holder-dob");
+  const badge = document.getElementById("badge-insurance");
+
+  const isProvisional = carrier.value === "unknown";
+  const carrierText = carrier.options[carrier.selectedIndex].text;
+  const relationshipText = isProvisional
+    ? ""
+    : relationship.options[relationship.selectedIndex].text;
+
+  const primarySection = document.getElementById("primary-insurance-fields");
+  primarySection.innerHTML = "";
+
+  const summary = document.createElement("div");
+  summary.id = "primary-insurance-summary";
+
+  function makeViewField(labelText, valueText) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "physician-view-field";
+    const lbl = document.createElement("label");
+    lbl.textContent = labelText;
+    const val = document.createElement("span");
+    val.textContent = valueText;
+    wrapper.appendChild(lbl);
+    wrapper.appendChild(val);
+    return wrapper;
+  }
+
+  const title = document.createElement("h5");
+  title.className = "insurance-subsection-title";
+  title.textContent = "Primary Insurance";
+  summary.appendChild(title);
+
+  if (isProvisional) {
+    summary.appendChild(
+      makeViewField("Insurance Carrier", "Unknown / Will sort later"),
+    );
+  } else {
+    summary.appendChild(makeViewField("Insurance Carrier", carrierText));
+    summary.appendChild(makeViewField("Member ID", memberId.value.trim()));
+    summary.appendChild(makeViewField("Relationship", relationshipText));
+    summary.appendChild(
+      makeViewField(
+        "Holder Name",
+        `${firstname.value.trim()} ${lastname.value.trim()}`,
+      ),
+    );
+    summary.appendChild(makeViewField("Holder DOB", dob.value));
+  }
+
+  const actions = document.createElement("div");
+  actions.className = "accordion-actions";
+  const primaryActions = document.createElement("div");
+  primaryActions.className = "primary-actions";
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.className = "edit-button";
+  editBtn.id = "edit-primary-insurance-btn";
+  primaryActions.appendChild(editBtn);
+  actions.appendChild(primaryActions);
+  summary.appendChild(actions);
+  primarySection.appendChild(summary);
+
+  if (isProvisional) {
+    badge.textContent = "Provisional";
+    badge.className = "section-status-badge provisional";
+  } else {
+    badge.textContent = "Complete";
+    badge.className = "section-status-badge complete";
+  }
+
+  // Show "Add Secondary Insurance" button only for valid carriers
+  const noSecondaryCarriers = ["unknown", "selfpay", ""];
+  const existingSecBtn = document.getElementById("add-secondary-btn");
+  if (existingSecBtn) existingSecBtn.remove();
+
+  if (!noSecondaryCarriers.includes(carrier.value)) {
+    const addSecBtn = document.createElement("button");
+    addSecBtn.id = "add-secondary-btn";
+    addSecBtn.textContent = "+ Add Secondary Insurance";
+    addSecBtn.className = "add-secondary-btn";
+
+    addSecBtn.addEventListener("click", () => {
+      // Show divider
+      document.getElementById("insurance-divider").style.display = "block";
+
+      // Show secondary wrapper with animation
+      const wrapper = document.getElementById("secondary-insurance-wrapper");
+      wrapper.classList.add("visible");
+
+      // Hide the add button
+      addSecBtn.style.display = "none";
+    });
+
+    // Insert button after the primary summary actions
+    primarySection.appendChild(addSecBtn);
+  }
+
+  editBtn.addEventListener("click", () => {
+    primarySection.innerHTML = `
+      <h5 class="insurance-subsection-title">Primary Insurance</h5>
+      <div class="accordion-field">
+        <label for="prim-carrier">Insurance Carrier</label>
+        <select id="prim-carrier">
+          <option value="">Select carrier</option>
+          <option value="unknown">Unknown / Will sort later</option>
+          <option value="selfpay">Self-Pay</option>
+          <option value="aetna">Aetna</option>
+          <option value="bcbs">Blue Cross Blue Shield</option>
+          <option value="health-choice">Health Choice</option>
+          <option value="kaiser">Kaiser</option>
+          <option value="medicare">Medicare</option>
+          <option value="medicaid">Medicaid</option>
+          <option value="oscar">Oscar</option>
+          <option value="uhc">United Health Care</option>
+          <option value="veterans">Veterans Administration</option>
+          <option value="workcomp">Worker's Compensation</option>
+        </select>
+      </div>
+      <div class="accordion-field">
+        <label for="prim-member-id">Member ID</label>
+        <input id="prim-member-id" type="text" placeholder="Member ID" />
+      </div>
+      <div class="accordion-field">
+        <label for="prim-relationship">Relationship</label>
+        <select id="prim-relationship">
+          <option value="">Select relationship</option>
+          <option value="self">Self</option>
+          <option value="mother">Mother</option>
+          <option value="father">Father</option>
+          <option value="sibling">Sibling</option>
+          <option value="spouse">Spouse</option>
+          <option value="daughter">Daughter</option>
+          <option value="son">Son</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="accordion-field">
+        <label for="prim-holder-firstname">Holder First Name</label>
+        <input id="prim-holder-firstname" type="text" placeholder="First Name" />
+      </div>
+      <div class="accordion-field">
+        <label for="prim-holder-lastname">Holder Last Name</label>
+        <input id="prim-holder-lastname" type="text" placeholder="Last Name" />
+      </div>
+      <div class="accordion-field">
+        <label for="prim-holder-dob">Holder DOB</label>
+        <input id="prim-holder-dob" type="date" />
+      </div>
+      <div class="accordion-actions">
+        <div class="primary-actions">
+          <button class="save-button" id="save-primary-insurance-btn" disabled
+            style="background:#e5e7eb; color:#9ca3af; cursor:not-allowed;">
+            Save Primary
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Restore saved values
+    document.getElementById("prim-carrier").value = carrier.value;
+    document.getElementById("prim-member-id").value = memberId.value;
+    document.getElementById("prim-relationship").value = relationship.value;
+    document.getElementById("prim-holder-firstname").value = firstname.value;
+    document.getElementById("prim-holder-lastname").value = lastname.value;
+    document.getElementById("prim-holder-dob").value = dob.value;
+
+    // Reset badge
+    badge.textContent = "Incomplete";
+    badge.className = "section-status-badge incomplete";
+
+    // Re-attach listeners
+    ["prim-carrier", "prim-relationship"].forEach((id) => {
+      document
+        .getElementById(id)
+        .addEventListener("change", checkPrimaryInsuranceComplete);
+    });
+
+    document
+      .getElementById("prim-carrier")
+      .addEventListener("change", applyProvisionalToggle);
+    // Re-attach save button
+    document
+      .getElementById("save-primary-insurance-btn")
+      .addEventListener("click", savePrimaryInsurance);
+    applyProvisionalToggle();
+    checkPrimaryInsuranceComplete();
+  });
+}
+
+document
+  .getElementById("save-primary-insurance-btn")
+  .addEventListener("click", savePrimaryInsurance);
+
+// SAVE SECONDARY INSURANCE
+function saveSecondaryInsurance() {
+  const carrier = document.getElementById("sec-carrier");
+  const memberId = document.getElementById("sec-member-id");
+  const relationship = document.getElementById("sec-relationship");
+  const firstname = document.getElementById("sec-holder-firstname");
+  const lastname = document.getElementById("sec-holder-lastname");
+  const dob = document.getElementById("sec-holder-dob");
+
+  // Guard: if fields don't exist, abort
+  if (!carrier || !memberId || !relationship || !firstname || !lastname || !dob)
+    return;
+
+  const carrierText = carrier.options[carrier.selectedIndex].text;
+  const relationshipText =
+    relationship.options[relationship.selectedIndex].text;
+  const secondarySection = document.getElementById(
+    "secondary-insurance-fields",
+  );
+  secondarySection.innerHTML = "";
+
+  const summary = document.createElement("div");
+  summary.id = "secondary-insurance-summary";
+
+  function makeViewField(labelText, valueText) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "physician-view-field";
+    const lbl = document.createElement("label");
+    lbl.textContent = labelText;
+    const val = document.createElement("span");
+    val.textContent = valueText;
+    wrapper.appendChild(lbl);
+    wrapper.appendChild(val);
+    return wrapper;
+  }
+
+  const title = document.createElement("h5");
+  title.className = "insurance-subsection-title";
+  title.textContent = "Secondary Insurance";
+  summary.appendChild(title);
+
+  summary.appendChild(makeViewField("Insurance Carrier", carrierText));
+  summary.appendChild(makeViewField("Member ID", memberId.value.trim()));
+  summary.appendChild(makeViewField("Relationship", relationshipText));
+  summary.appendChild(
+    makeViewField(
+      "Holder Name",
+      `${firstname.value.trim()} ${lastname.value.trim()}`,
+    ),
+  );
+  summary.appendChild(makeViewField("Holder DOB", dob.value));
+
+  // Edit and Delete buttons
+  const actions = document.createElement("div");
+  actions.className = "accordion-actions";
+  const primary = document.createElement("div");
+  primary.className = "primary-actions";
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Remove Secondary";
+  deleteBtn.className = "delete-note-btn";
+  deleteBtn.id = "delete-secondary-insurance-btn";
+
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.className = "edit-button";
+  editBtn.id = "edit-secondary-insurance-btn";
+
+  primary.appendChild(deleteBtn);
+  primary.appendChild(editBtn);
+  actions.appendChild(primary);
+  summary.appendChild(actions);
+
+  secondarySection.appendChild(summary);
+
+  // DELETE secondary insurance
+  deleteBtn.addEventListener("click", () => {
+    showConfirmModal(
+      "Remove secondary insurance?",
+      "This will delete the secondary insurance information.",
+      () => {
+        // Clear the secondary section back to original form
+        secondarySection.innerHTML = `
+        <h5 class="insurance-subsection-title">Secondary Insurance</h5>
+        <div class="accordion-field">
+          <label for="sec-carrier">Insurance Carrier</label>
+          <select id="sec-carrier">
+            <option value="">Select carrier</option>
+            <option value="selfpay">Self-Pay</option>
+            <option value="aetna">Aetna</option>
+            <option value="bcbs">Blue Cross Blue Shield</option>
+            <option value="health-choice">Health Choice</option>
+            <option value="kaiser">Kaiser</option>
+            <option value="medicare">Medicare</option>
+            <option value="medicaid">Medicaid</option>
+            <option value="oscar">Oscar</option>
+            <option value="uhc">United Health Care</option>
+            <option value="veterans">Veterans Administration</option>
+            <option value="workcomp">Worker's Compensation</option>
+          </select>
+        </div>
+        <div class="accordion-field">
+          <label for="sec-member-id">Member ID</label>
+          <input id="sec-member-id" type="text" placeholder="Member ID" />
+        </div>
+        <div class="accordion-field">
+          <label for="sec-relationship">Relationship</label>
+          <select id="sec-relationship">
+            <option value="">Select relationship</option>
+            <option value="self">Self</option>
+            <option value="mother">Mother</option>
+            <option value="father">Father</option>
+            <option value="sibling">Sibling</option>
+            <option value="spouse">Spouse</option>
+            <option value="daughter">Daughter</option>
+            <option value="son">Son</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="accordion-field">
+          <label for="sec-holder-firstname">Holder First Name</label>
+          <input id="sec-holder-firstname" type="text" placeholder="First Name" />
+        </div>
+        <div class="accordion-field">
+          <label for="sec-holder-lastname">Holder Last Name</label>
+          <input id="sec-holder-lastname" type="text" placeholder="Last Name" />
+        </div>
+        <div class="accordion-field">
+          <label for="sec-holder-dob">Holder DOB</label>
+          <input id="sec-holder-dob" type="date" />
+        </div>
+        <div class="accordion-actions">
+          <div class="primary-actions">
+            <button class="edit-button" id="cancel-secondary-btn">Cancel</button>
+            <button class="save-button" id="save-secondary-insurance-btn" disabled
+              style="background:#e5e7eb; color:#9ca3af; cursor:not-allowed;">
+              Save Secondary
+            </button>
+          </div>
+        </div>
+      `;
+
+        // Hide wrapper and divider
+        const wrapper = document.getElementById("secondary-insurance-wrapper");
+        wrapper.classList.remove("visible");
+        document.getElementById("insurance-divider").style.display = "none";
+
+        // Show Add Secondary button again
+        const addSecBtn = document.getElementById("add-secondary-btn");
+        if (addSecBtn) addSecBtn.style.display = "";
+
+        // Re-attach listeners for next time
+        ["sec-carrier", "sec-relationship"].forEach((id) => {
+          document
+            .getElementById(id)
+            .addEventListener("change", checkSecondaryInsuranceComplete);
+        });
+        [
+          "sec-member-id",
+          "sec-holder-firstname",
+          "sec-holder-lastname",
+          "sec-holder-dob",
+        ].forEach((id) => {
+          document
+            .getElementById(id)
+            .addEventListener("input", checkSecondaryInsuranceComplete);
+        });
+        document
+          .getElementById("cancel-secondary-btn")
+          .addEventListener("click", () => {
+            const wrapper = document.getElementById(
+              "secondary-insurance-wrapper",
+            );
+            wrapper.classList.remove("visible");
+            document.getElementById("insurance-divider").style.display = "none";
+            const addSecBtn = document.getElementById("add-secondary-btn");
+            if (addSecBtn) addSecBtn.style.display = "";
+          });
+        document
+          .getElementById("save-secondary-insurance-btn")
+          .addEventListener("click", saveSecondaryInsurance);
+      },
+    );
+  });
+
+  // EDIT button — restore secondary fields
+  editBtn.addEventListener("click", () => {
+    secondarySection.innerHTML = `
+      <h5 class="insurance-subsection-title">Secondary Insurance</h5>
+      <div class="accordion-field">
+        <label for="sec-carrier">Insurance Carrier</label>
+        <select id="sec-carrier">
+          <option value="">Select carrier</option>
+          <option value="selfpay">Self-Pay</option>
+          <option value="aetna">Aetna</option>
+          <option value="bcbs">Blue Cross Blue Shield</option>
+          <option value="health-choice">Health Choice</option>
+          <option value="kaiser">Kaiser</option>
+          <option value="medicare">Medicare</option>
+          <option value="medicaid">Medicaid</option>
+          <option value="oscar">Oscar</option>
+          <option value="uhc">United Health Care</option>
+          <option value="veterans">Veterans Administration</option>
+          <option value="workcomp">Worker's Compensation</option>
+        </select>
+      </div>
+      <div class="accordion-field">
+        <label for="sec-member-id">Member ID</label>
+        <input id="sec-member-id" type="text" placeholder="Member ID" />
+      </div>
+      <div class="accordion-field">
+        <label for="sec-relationship">Relationship</label>
+        <select id="sec-relationship">
+          <option value="">Select relationship</option>
+          <option value="self">Self</option>
+          <option value="mother">Mother</option>
+          <option value="father">Father</option>
+          <option value="sibling">Sibling</option>
+          <option value="spouse">Spouse</option>
+          <option value="daughter">Daughter</option>
+          <option value="son">Son</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="accordion-field">
+        <label for="sec-holder-firstname">Holder First Name</label>
+        <input id="sec-holder-firstname" type="text" placeholder="First Name" />
+      </div>
+      <div class="accordion-field">
+        <label for="sec-holder-lastname">Holder Last Name</label>
+        <input id="sec-holder-lastname" type="text" placeholder="Last Name" />
+      </div>
+      <div class="accordion-field">
+        <label for="sec-holder-dob">Holder DOB</label>
+        <input id="sec-holder-dob" type="date" />
+      </div>
+      <div class="accordion-actions">
+        <div class="primary-actions">
+          <button class="edit-button" id="cancel-secondary-btn">Cancel</button>
+          <button class="save-button" id="save-secondary-insurance-btn" disabled
+            style="background:#e5e7eb; color:#9ca3af; cursor:not-allowed;">
+            Save Secondary
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Restore saved values
+    document.getElementById("sec-carrier").value = carrier.value;
+    document.getElementById("sec-member-id").value = memberId.value;
+    document.getElementById("sec-relationship").value = relationship.value;
+    document.getElementById("sec-holder-firstname").value = firstname.value;
+    document.getElementById("sec-holder-lastname").value = lastname.value;
+    document.getElementById("sec-holder-dob").value = dob.value;
+
+    // Re-attach listeners
+    ["sec-carrier", "sec-relationship"].forEach((id) => {
+      document
+        .getElementById(id)
+        .addEventListener("change", checkSecondaryInsuranceComplete);
+    });
+    [
+      "sec-member-id",
+      "sec-holder-firstname",
+      "sec-holder-lastname",
+      "sec-holder-dob",
+    ].forEach((id) => {
+      document
+        .getElementById(id)
+        .addEventListener("input", checkSecondaryInsuranceComplete);
+    });
+
+    // Re-attach cancel button
+    document
+      .getElementById("cancel-secondary-btn")
+      .addEventListener("click", () => {
+        const wrapper = document.getElementById("secondary-insurance-wrapper");
+        wrapper.classList.remove("visible");
+        document.getElementById("insurance-divider").style.display = "none";
+        const addSecBtn = document.getElementById("add-secondary-btn");
+        if (addSecBtn) addSecBtn.style.display = "";
+      });
+
+    // Re-attach save button
+    document
+      .getElementById("save-secondary-insurance-btn")
+      .addEventListener("click", saveSecondaryInsurance);
+
+    [
+      "sec-member-id",
+      "sec-holder-firstname",
+      "sec-holder-lastname",
+      "sec-holder-dob",
+    ].forEach((id) => {
+      document
+        .getElementById(id)
+        .addEventListener("input", checkSecondaryInsuranceComplete);
+    });
+    checkSecondaryInsuranceComplete();
+  });
+}
+
+// CANCEL SECONDARY INSURANCE
+document
+  .getElementById("cancel-secondary-btn")
+  .addEventListener("click", () => {
+    // Hide the secondary wrapper
+    const wrapper = document.getElementById("secondary-insurance-wrapper");
+    wrapper.classList.remove("visible");
+
+    // Hide the divider
+    document.getElementById("insurance-divider").style.display = "none";
+
+    // Show the Add Secondary button again
+    const addSecBtn = document.getElementById("add-secondary-btn");
+    if (addSecBtn) addSecBtn.style.display = "";
+  });
+
+document
+  .getElementById("save-secondary-insurance-btn")
+  .addEventListener("click", saveSecondaryInsurance);
 
 // PHYSICIAN SAVE / EDIT MODE
 

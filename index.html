@@ -394,195 +394,226 @@
               </div>
             </section>
 
-            <section class="accordion-section">
-              <button class="accordion-header">Screening Questions</button>
-              <div class="accordion-content">
-                <div class="accordion-field">
-                  <label for="screening-question"
-                    >First time having a mammogram?</label
-                  >
-                  <input id="screening-question" type="text" />
-                </div>
-                <div class="accordion-field">
-                  <label for="screening-question"
-                    >When was your last mammogram?</label
-                  >
-                  <input id="screening-question" type="text" />
-                </div>
-
-                <div class="accordion-field">
-                  <label for="screening-question"
-                    >Where was your last mammogram?</label
-                  >
-                  <input id="screening-question" type="text" />
-                </div>
-                <div class="accordion-field">
-                  <label for="screening-question">Breast implants?</label>
-                  <input id="screening-question" type="text" />
-                </div>
-
-                <div class="accordion-field">
-                  <label for="screening-question"
-                    >Any symptoms of pain, lumps or discharge on breasts?</label
-                  >
-                  <input id="screening-question" type="text" />
-                </div>
-
-                <div class="accordion-field">
-                  <label for="screening-question"
-                    >Any family history of breast cancer?</label
-                  >
-                  <input id="screening-question" type="text" />
-                </div>
-
-                <div class="accordion-field">
-                  <label for="screening-question"
-                    >Any family history of breast cancer?</label
-                  >
-                  <input id="screening-question" type="text" />
-                </div>
-                <div class="accordion-actions">
-                  <div class="primary-actions">
-                    <button class="edit-button">Edit</button>
-                    <button class="save-button">Save</button>
-                  </div>
-                </div>
+            <section class="accordion-section" id="screening-section">
+              <button class="accordion-header">
+                Screening Questions
+                <span
+                  class="section-status-badge incomplete"
+                  id="badge-screening"
+                  >Incomplete</span
+                >
+              </button>
+              <div class="accordion-content" id="screening-content">
+                <!-- Questions will be injected here by JavaScript -->
               </div>
             </section>
 
-            <section class="accordion-section">
-              <button class="accordion-header">Insurance Info</button>
+            <section class="accordion-section" id="insurance-section">
+              <button class="accordion-header">
+                Insurance Info
+                <span
+                  class="section-status-badge incomplete"
+                  id="badge-insurance"
+                  >Incomplete</span
+                >
+              </button>
               <div class="accordion-content">
-                <div class="accordion-field">
-                  <label for="insurance-select">Primary Insurance</label>
-                  <select id="insurance-select">
-                    <option value=""></option>
-                    <option value="selfpay">Self-Pay</option>
-                    <option value="insurance-on-file">Aetna</option>
-                    <option value="bcbs">Blue Cross Blue Shield</option>
-                    <option value="health-choice">Health Choise</option>
-                    <option value="kaiser">Kaiser</option>
-                    <option value="medicare">Medicare</option>
-                    <option value="medicaid">Medicaid</option>
-                    <option value="oscar">Oscar</option>
-                    <option value="uhc">United Health Care</option>
-                    <option value="veterans">Veterans Administration</option>
-                    <option value="workcomp">Worker's Compensation</option>
-                  </select>
+                <!-- PRIMARY INSURANCE -->
+                <div class="insurance-subsection" id="primary-insurance-fields">
+                  <h5 class="insurance-subsection-title">Primary Insurance</h5>
+
+                  <div class="accordion-field">
+                    <label for="prim-carrier">Insurance Carrier</label>
+                    <select id="prim-carrier">
+                      <option value="">Select carrier</option>
+                      <option value="unknown">Unknown / Will call back</option>
+                      <option value="selfpay">Self-Pay</option>
+                      <option value="aetna">Aetna</option>
+                      <option value="bcbs">Blue Cross Blue Shield</option>
+                      <option value="health-choice">Health Choice</option>
+                      <option value="kaiser">Kaiser</option>
+                      <option value="medicare">Medicare</option>
+                      <option value="medicaid">Medicaid</option>
+                      <option value="oscar">Oscar</option>
+                      <option value="uhc">United Health Care</option>
+                      <option value="veterans">Veterans Administration</option>
+                      <option value="workcomp">Worker's Compensation</option>
+                    </select>
+                  </div>
+
+                  <div class="accordion-field">
+                    <label for="prim-member-id">Member ID</label>
+                    <input
+                      id="prim-member-id"
+                      type="text"
+                      placeholder="Member ID"
+                    />
+                  </div>
+
+                  <div class="accordion-field">
+                    <label for="prim-relationship">Relationship</label>
+                    <select id="prim-relationship">
+                      <option value="">Select relationship</option>
+                      <option value="self">Self</option>
+                      <option value="mother">Mother</option>
+                      <option value="father">Father</option>
+                      <option value="sibling">Sibling</option>
+                      <option value="spouse">Spouse</option>
+                      <option value="daughter">Daughter</option>
+                      <option value="son">Son</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div class="accordion-field">
+                    <label for="prim-holder-firstname">Holder First Name</label>
+                    <input
+                      id="prim-holder-firstname"
+                      type="text"
+                      placeholder="First Name"
+                    />
+                  </div>
+
+                  <div class="accordion-field">
+                    <label for="prim-holder-lastname">Holder Last Name</label>
+                    <input
+                      id="prim-holder-lastname"
+                      type="text"
+                      placeholder="Last Name"
+                    />
+                  </div>
+
+                  <div class="accordion-field">
+                    <label for="prim-holder-dob">Holder DOB</label>
+                    <input id="prim-holder-dob" type="date" />
+                  </div>
+
+                  <div class="accordion-actions">
+                    <div class="primary-actions">
+                      <button
+                        class="save-button"
+                        id="save-primary-insurance-btn"
+                        disabled
+                        style="
+                          background: #e5e7eb;
+                          color: #9ca3af;
+                          cursor: auto;
+                        "
+                      >
+                        Save Primary
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="accordion-field">
-                  <label for="insurance-relationship">Relationship</label>
-                  <select
-                    id="insurance-relationship"
-                    name="insurance-relationship"
+                <!-- DIVIDER -->
+                <div
+                  class="insurance-divider"
+                  id="insurance-divider"
+                  style="display: none"
+                ></div>
+
+                <!-- SECONDARY INSURANCE -->
+                <div
+                  class="secondary-insurance-wrapper"
+                  id="secondary-insurance-wrapper"
+                >
+                  <div
+                    class="insurance-subsection"
+                    id="secondary-insurance-fields"
                   >
-                    <option value=""></option>
-                    <option value="self">Self</option>
-                    <option value="mother">Mother</option>
-                    <option value="father">Father</option>
-                    <option value="sibling">Sibling</option>
-                    <option value="spouse">Spouse</option>
-                    <option value="daughter">Daughter</option>
-                    <option value="son">Son</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
+                    <h5 class="insurance-subsection-title">
+                      Secondary Insurance
+                    </h5>
 
-                <div class="accordion-field">
-                  <label for="prim-insurance-member-id">Member ID</label>
-                  <input id="prim-insurance-member-id" type="text" />
-                </div>
+                    <div class="accordion-field">
+                      <label for="sec-carrier">Insurance Carrier</label>
+                      <select id="sec-carrier">
+                        <option value="">Select carrier</option>
+                        <option value="selfpay">Self-Pay</option>
+                        <option value="aetna">Aetna</option>
+                        <option value="bcbs">Blue Cross Blue Shield</option>
+                        <option value="health-choice">Health Choice</option>
+                        <option value="kaiser">Kaiser</option>
+                        <option value="medicare">Medicare</option>
+                        <option value="medicaid">Medicaid</option>
+                        <option value="oscar">Oscar</option>
+                        <option value="uhc">United Health Care</option>
+                        <option value="veterans">
+                          Veterans Administration
+                        </option>
+                        <option value="workcomp">Worker's Compensation</option>
+                      </select>
+                    </div>
 
-                <div class="accordion-field">
-                  <label for="tab-insurance-holder-name"
-                    >Insurance Holder</label
-                  >
-                  <input
-                    id="tab-insurance-holder-name"
-                    type="text"
-                    placeholder="First Name"
-                  />
-                </div>
-                <div class="accordion-field">
-                  <input
-                    id="tab-insurance-holder-lastname"
-                    type="text"
-                    placeholder="Last Name"
-                  />
-                </div>
-                <div class="accordion-field">
-                  <label for="tab-insurance-holder-dob">DOB</label>
-                  <input id="tab-insurance-holder-dob" type="date" />
-                </div>
-              </div>
+                    <div class="accordion-field">
+                      <label for="sec-member-id">Member ID</label>
+                      <input
+                        id="sec-member-id"
+                        type="text"
+                        placeholder="Member ID"
+                      />
+                    </div>
 
-              <div class="accordion-content">
-                <div class="accordion-field">
-                  <label for="sec-insurance-select">Secondary Insurance</label>
-                  <select id="sec-insurance-select">
-                    <option value=""></option>
-                    <option value="selfpay">Self-Pay</option>
-                    <option value="insurance-on-file">Aetna</option>
-                    <option value="bcbs">Blue Cross Blue Shield</option>
-                    <option value="health-choice">Health Choise</option>
-                    <option value="kaiser">Kaiser</option>
-                    <option value="medicare">Medicare</option>
-                    <option value="medicaid">Medicaid</option>
-                    <option value="oscar">Oscar</option>
-                    <option value="uhc">United Health Care</option>
-                    <option value="veterans">Veterans Administration</option>
-                    <option value="workcomp">Worker's Compensation</option>
-                  </select>
-                </div>
+                    <div class="accordion-field">
+                      <label for="sec-relationship">Relationship</label>
+                      <select id="sec-relationship">
+                        <option value="">Select relationship</option>
+                        <option value="self">Self</option>
+                        <option value="mother">Mother</option>
+                        <option value="father">Father</option>
+                        <option value="sibling">Sibling</option>
+                        <option value="spouse">Spouse</option>
+                        <option value="daughter">Daughter</option>
+                        <option value="son">Son</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
 
-                <div class="accordion-field">
-                  <label for="insurance-relationship">Relationship</label>
-                  <select
-                    id="insurance-relationship"
-                    name="insurance-relationship"
-                  >
-                    <option value=""></option>
-                    <option value="self">Self</option>
-                    <option value="mother">Mother</option>
-                    <option value="father">Father</option>
-                    <option value="sibling">Sibling</option>
-                    <option value="spouse">Spouse</option>
-                    <option value="daughter">Daughter</option>
-                    <option value="son">Son</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
+                    <div class="accordion-field">
+                      <label for="sec-holder-firstname"
+                        >Holder First Name</label
+                      >
+                      <input
+                        id="sec-holder-firstname"
+                        type="text"
+                        placeholder="First Name"
+                      />
+                    </div>
 
-                <div class="accordion-field">
-                  <label for="prim-insurance-member-id">Member ID</label>
-                  <input id="prim-insurance-member-id" type="text" />
-                </div>
-                <div class="accordion-field">
-                  <label for="tab-sec-insurance-holder-name"
-                    >Insurance Holder</label
-                  >
-                  <input
-                    id="tab-sec-insurance-holder-name"
-                    type="text"
-                    placeholder="First Name"
-                  />
-                </div>
-                <div class="accordion-field">
-                  <input
-                    id="tab-sec-insurance-holder-lastname"
-                    type="text"
-                    placeholder="Last Name"
-                  />
-                </div>
-                <div class="accordion-field">
-                  <label for="tab-sec-insurance-holder-dob">DOB</label>
-                  <input id="tab-sec-insurance-holder-dob" type="date" />
-                </div>
-                <div class="accordion-actions">
-                  <div class="primary-actions">
-                    <button class="edit-button">Edit</button>
-                    <button class="save-button">Save</button>
+                    <div class="accordion-field">
+                      <label for="sec-holder-lastname">Holder Last Name</label>
+                      <input
+                        id="sec-holder-lastname"
+                        type="text"
+                        placeholder="Last Name"
+                      />
+                    </div>
+
+                    <div class="accordion-field">
+                      <label for="sec-holder-dob">Holder DOB</label>
+                      <input id="sec-holder-dob" type="date" />
+                    </div>
+
+                    <div class="accordion-actions">
+                      <div class="primary-actions">
+                        <button class="edit-button" id="cancel-secondary-btn">
+                          Cancel
+                        </button>
+                        <button
+                          class="save-button"
+                          id="save-secondary-insurance-btn"
+                          disabled
+                          style="
+                            background: #e5e7eb;
+                            color: #9ca3af;
+                            cursor: not-allowed;
+                          "
+                        >
+                          Save Secondary
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -921,6 +952,41 @@
 
         <div class="notes-modal-body">
           <!-- Notes will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIRMATION MODAL -->
+    <div id="confirmModal" class="modal-backdrop">
+      <div class="delete-modal">
+        <h3 id="confirmModalTitle">Please confirm</h3>
+        <p
+          id="confirmModalBody"
+          style="
+            font-size: 1.3rem;
+            color: #374151;
+            margin: 1rem 0;
+            line-height: 1.6;
+          "
+        ></p>
+        <div class="delete-actions">
+          <button id="confirmModalCancel">Cancel</button>
+          <button
+            id="confirmModalConfirm"
+            class="save-button"
+            style="
+              padding: 0.5rem 1.2rem;
+              border-radius: 8px;
+              border: none;
+              background: #2563eb;
+              color: white;
+              font-size: 1.2rem;
+              font-weight: 600;
+              cursor: pointer;
+            "
+          >
+            Confirm
+          </button>
         </div>
       </div>
     </div>
