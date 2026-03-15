@@ -1015,6 +1015,23 @@ function applyStatusChange(newStatus, reason) {
     statusBadge.textContent = "On Hold";
     statusBadge.className = "status-badge status-onhold";
 
+    // Lock clinic and room
+    clinicSelect.disabled = true;
+    roomSelect.disabled = true;
+
+    // Hide calendar, reset slot state
+    const calendarBody = document.querySelector(".calendar-panel-body");
+    calendarBody.style.display = "none";
+    selectedDate = null;
+    timeSelect.value = "";
+    slotSaved = false;
+
+    // Hide Save Slot / Schedule Appointment buttons
+    const saveSlotBtn = document.getElementById("save-slot-btn");
+    const scheduleBtn = document.getElementById("schedule-appointment-btn");
+    saveSlotBtn.style.display = "none";
+    scheduleBtn.style.display = "none";
+
     summaryBox.className = "appointment-summary-box on-hold";
     summaryBox.innerHTML = `
       <h4>Appointment On Hold</h4>
@@ -1028,6 +1045,23 @@ function applyStatusChange(newStatus, reason) {
     currentAppointmentStatus = "Cancelled";
     statusBadge.textContent = "Cancelled";
     statusBadge.className = "status-badge status-cancelled";
+
+    // Lock clinic and room
+    clinicSelect.disabled = true;
+    roomSelect.disabled = true;
+
+    // Hide calendar, reset slot state
+    const calendarBody = document.querySelector(".calendar-panel-body");
+    calendarBody.style.display = "none";
+    selectedDate = null;
+    timeSelect.value = "";
+    slotSaved = false;
+
+    // Hide Save Slot / Schedule Appointment buttons
+    const saveSlotBtn = document.getElementById("save-slot-btn");
+    const scheduleBtn = document.getElementById("schedule-appointment-btn");
+    saveSlotBtn.style.display = "none";
+    scheduleBtn.style.display = "none";
 
     summaryBox.className = "appointment-summary-box cancelled";
     summaryBox.innerHTML = `
