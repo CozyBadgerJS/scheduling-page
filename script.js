@@ -2124,7 +2124,6 @@ function savePrimaryInsurance() {
     wrapper.appendChild(lbl);
     wrapper.appendChild(val);
     return wrapper;
-    updateScheduleAppointmentBtn();
   }
 
   const title = document.createElement("h5");
@@ -2331,6 +2330,7 @@ function savePrimaryInsurance() {
     applyProvisionalToggle();
     checkPrimaryInsuranceComplete();
   });
+  updateScheduleAppointmentBtn();
 }
 
 document
@@ -2648,6 +2648,7 @@ function saveSecondaryInsurance() {
     });
     checkSecondaryInsuranceComplete();
   });
+  updateScheduleAppointmentBtn();
 }
 
 // CANCEL SECONDARY INSURANCE

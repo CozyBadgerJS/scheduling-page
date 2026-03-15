@@ -1470,8 +1470,12 @@ body.modal-open {
 /* Selected day */
 .calendar-grid button.selected {
   background: #2563eb;
-  color: white;
+  color: #fff;
   font-weight: 600;
+}
+
+.calendar-grid button.selected:hover {
+  color: #333;
 }
 
 /* Disabled days */
