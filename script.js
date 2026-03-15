@@ -181,9 +181,14 @@ function saveScreeningQuestions() {
         input.value = answers[i]?.answer || "";
       });
 
+      // Set badge to Ready to Save since all answers are still filled
+      badge.textContent = "Ready to Save";
+      badge.className = "section-status-badge ready";
+
       // Re-check completion so Save button state is correct
       checkScreeningComplete();
     });
+  updateScheduleAppointmentBtn();
 }
 
 // CHECK IF ALL SCREENING QUESTIONS ARE ANSWERED
@@ -204,8 +209,8 @@ function checkScreeningComplete() {
     saveBtn.style.background = "#2563eb";
     saveBtn.style.color = "#ffffff";
     saveBtn.style.cursor = "pointer";
-    badge.textContent = "Complete";
-    badge.className = "section-status-badge complete";
+    badge.textContent = "Ready to Save";
+    badge.className = "section-status-badge ready";
   } else {
     saveBtn.disabled = true;
     saveBtn.style.background = "#e5e7eb";
@@ -348,6 +353,7 @@ const clinics = [
 // GENERATE TIME SLOTS FOR EXAMS
 let selectedDate = null;
 let selectedTime = null;
+let slotSaved = false;
 
 // POPULATING CLINICS
 const clinicSelect = document.getElementById("clinic");
@@ -380,7 +386,10 @@ function updateCalendarLock() {
   }
 }
 
-roomSelect.addEventListener("change", updateCalendarLock);
+roomSelect.addEventListener("change", () => {
+  updateCalendarLock();
+  updateSaveSlotBtn();
+});
 
 clinicSelect.addEventListener("change", () => {
   const selectedClinicId = clinicSelect.value;
@@ -404,6 +413,7 @@ clinicSelect.addEventListener("change", () => {
   });
 
   updateCalendarLock();
+  updateSaveSlotBtn();
 });
 
 // TOGGLE ACCORDEON
@@ -691,6 +701,8 @@ function renderCalendar(date) {
 
           selectedDate = thisDay;
           updateTimeSlots(selectedDate);
+          updateSaveSlotBtn();
+          resetToSaveSlot();
         });
       }
 
@@ -790,15 +802,349 @@ function updateTimeSlots(date) {
   }
 
   timeSelect.disabled = false;
-  timeSelect.addEventListener("change", updateSaveSlotBtn);
+  timeSelect.addEventListener("change", () => {
+    updateSaveSlotBtn();
+    resetToSaveSlot();
+    updateOrderHeader();
+  });
+}
+
+// CHECK IF ALL REQUIRED SECTIONS ARE COMPLETE OR PROVISIONAL
+function checkSectionsComplete() {
+  const physicianBadge = document.getElementById("badge-physician");
+  const screeningBadge = document.getElementById("badge-screening");
+  const insuranceBadge = document.getElementById("badge-insurance");
+
+  const validStates = ["Complete", "Provisional"];
+
+  const physicianOk = validStates.includes(physicianBadge?.textContent.trim());
+  const screeningOk = validStates.includes(screeningBadge?.textContent.trim());
+  const insuranceOk = validStates.includes(insuranceBadge?.textContent.trim());
+
+  return physicianOk && screeningOk && insuranceOk;
+}
+function updateScheduleAppointmentBtn() {
+  const scheduleBtn = document.getElementById("schedule-appointment-btn");
+  if (!scheduleBtn) return;
+
+  // Only act if slot has been saved
+  if (!slotSaved) return;
+
+  if (checkSectionsComplete()) {
+    scheduleBtn.disabled = false;
+    scheduleBtn.style.background = "#2563eb";
+    scheduleBtn.style.color = "#ffffff";
+    scheduleBtn.style.cursor = "pointer";
+  } else {
+    scheduleBtn.disabled = true;
+    scheduleBtn.style.background = "#e5e7eb";
+    scheduleBtn.style.color = "#9ca3af";
+    scheduleBtn.style.cursor = "not-allowed";
+  }
 }
 
 // SAVE SLOT GATING
 function updateSaveSlotBtn() {
   const saveSlotBtn = document.getElementById("save-slot-btn");
+  const clinicChosen = clinicSelect.value !== "";
+  const roomChosen = roomSelect.value !== "";
+  const dateChosen = selectedDate !== null;
   const timeChosen = timeSelect.value !== "";
-  saveSlotBtn.disabled = !timeChosen;
+
+  const allChosen = clinicChosen && roomChosen && dateChosen && timeChosen;
+  saveSlotBtn.disabled = !allChosen;
 }
+
+// RESET BACK TO SAVE SLOT
+function resetToSaveSlot() {
+  const saveSlotBtn = document.getElementById("save-slot-btn");
+  const scheduleBtn = document.getElementById("schedule-appointment-btn");
+
+  // Mark slot as no longer saved
+  slotSaved = false;
+
+  saveSlotBtn.style.display = "";
+  scheduleBtn.style.display = "none";
+}
+
+// CHANGE STATUS MODAL
+
+// Allowed transitions per current status
+const statusTransitions = {
+  Ordered: ["On Hold", "Cancel"],
+  Scheduled: ["Reschedule", "On Hold", "Cancel"],
+  "On Hold": ["Reschedule", "Cancel"],
+  Cancelled: [],
+};
+
+let currentAppointmentStatus = "Ordered";
+
+function openChangeStatusModal() {
+  const select = document.getElementById("statusChangeSelect");
+  const textarea = document.getElementById("statusChangeReason");
+  const charCount = document.getElementById("statusChangeCharCount");
+  const confirmBtn = document.getElementById("confirmStatusChange");
+
+  // Clear previous state
+  select.innerHTML = `<option value="">Select an option</option>`;
+  textarea.value = "";
+  charCount.textContent = "0 / 20 characters minimum";
+  charCount.style.color = "#9ca3af";
+  confirmBtn.disabled = true;
+  confirmBtn.style.background = "#e5e7eb";
+  confirmBtn.style.color = "#9ca3af";
+  confirmBtn.style.cursor = "not-allowed";
+
+  // Populate options based on current status
+  const options = statusTransitions[currentAppointmentStatus] || [];
+  options.forEach((opt) => {
+    const o = document.createElement("option");
+    o.value = opt;
+    o.textContent = opt;
+    select.appendChild(o);
+  });
+
+  document.getElementById("changeStatusModal").classList.add("active");
+  document.body.classList.add("modal-open");
+}
+
+function checkStatusChangeReady() {
+  const select = document.getElementById("statusChangeSelect");
+  const textarea = document.getElementById("statusChangeReason");
+  const charCount = document.getElementById("statusChangeCharCount");
+  const confirmBtn = document.getElementById("confirmStatusChange");
+
+  const chars = textarea.value.trim().length;
+  const optionChosen = select.value !== "";
+
+  charCount.textContent = `${chars} / 20 characters minimum`;
+  charCount.style.color = chars >= 20 ? "#059669" : "#9ca3af";
+
+  const isReady = chars >= 20 && optionChosen;
+  confirmBtn.disabled = !isReady;
+  confirmBtn.style.background = isReady ? "#2563eb" : "#e5e7eb";
+  confirmBtn.style.color = isReady ? "#ffffff" : "#9ca3af";
+  confirmBtn.style.cursor = isReady ? "pointer" : "not-allowed";
+}
+
+// Attach listeners for the modal fields
+document
+  .getElementById("statusChangeSelect")
+  .addEventListener("change", checkStatusChangeReady);
+document
+  .getElementById("statusChangeReason")
+  .addEventListener("input", checkStatusChangeReady);
+
+// Cancel button
+document.getElementById("cancelStatusChange").addEventListener("click", () => {
+  document.getElementById("changeStatusModal").classList.remove("active");
+  document.body.classList.remove("modal-open");
+});
+
+// Confirm button
+document.getElementById("confirmStatusChange").addEventListener("click", () => {
+  const select = document.getElementById("statusChangeSelect");
+  const textarea = document.getElementById("statusChangeReason");
+  const newStatus = select.value;
+  const reason = textarea.value.trim();
+
+  document.getElementById("changeStatusModal").classList.remove("active");
+  document.body.classList.remove("modal-open");
+
+  applyStatusChange(newStatus, reason);
+});
+
+function applyStatusChange(newStatus, reason) {
+  const statusBadge = document.querySelector(".status-badge");
+  const summaryBox = document.getElementById("appointment-summary-box");
+  const changeStatusBtn = document.querySelector(".schedule-btn:first-child");
+  const now = new Date();
+  const timestamp =
+    now.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }) +
+    " · " +
+    now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+  // Auto-save reason to Notes
+  const notesList = document.querySelector(".notes-list");
+  const noteCard = document.createElement("div");
+  noteCard.className = "note-card";
+  noteCard.dataset.timestamp = now.getTime();
+  noteCard.innerHTML = `
+    <div class="note-meta">
+      <span class="note-author">Scheduler – Cozy Badger</span>
+      <span class="note-time">${timestamp}</span>
+    </div>
+    <div class="note-content">Status changed to <strong>${newStatus}</strong>: ${reason}</div>
+    <div class="note-actions">
+      <button class="delete-note-btn">Delete</button>
+    </div>
+  `;
+  notesList.prepend(noteCard);
+  sortNotes(notesList, document.querySelector(".notes-sort").value);
+
+  // Apply the new status
+  if (newStatus === "Reschedule") {
+    currentAppointmentStatus = "Ordered";
+    statusBadge.textContent = "Ordered";
+    statusBadge.className = "status-badge status-ordered";
+    updateOrderHeader();
+
+    // Hide summary box, show calendar
+    summaryBox.style.display = "none";
+    summaryBox.innerHTML = "";
+    const calendarBody = document.querySelector(".calendar-panel-body");
+    calendarBody.style.display = "";
+
+    // Unlock clinic and room
+    clinicSelect.disabled = false;
+    roomSelect.disabled = false;
+
+    // Reset slot state
+    slotSaved = false;
+    const saveSlotBtn = document.getElementById("save-slot-btn");
+    const scheduleBtn = document.getElementById("schedule-appointment-btn");
+    saveSlotBtn.style.display = "";
+    scheduleBtn.style.display = "none";
+    updateSaveSlotBtn();
+  } else if (newStatus === "On Hold") {
+    currentAppointmentStatus = "On Hold";
+    statusBadge.textContent = "On Hold";
+    statusBadge.className = "status-badge status-onhold";
+
+    summaryBox.className = "appointment-summary-box on-hold";
+    summaryBox.innerHTML = `
+      <h4>Appointment On Hold</h4>
+      <p>
+        This appointment was placed on hold on <strong>${timestamp}</strong>.<br>
+        <em>${reason}</em>
+      </p>
+    `;
+    summaryBox.style.display = "flex";
+  } else if (newStatus === "Cancel") {
+    currentAppointmentStatus = "Cancelled";
+    statusBadge.textContent = "Cancelled";
+    statusBadge.className = "status-badge status-cancelled";
+
+    summaryBox.className = "appointment-summary-box cancelled";
+    summaryBox.innerHTML = `
+      <h4>Appointment Cancelled</h4>
+      <p>
+        This appointment was cancelled on <strong>${timestamp}</strong>.<br>
+        <em>${reason}</em>
+      </p>
+    `;
+    summaryBox.style.display = "flex";
+
+    // Hide Change Status button
+    changeStatusBtn.style.display = "none";
+  }
+
+  // Update currentAppointmentStatus for next transition
+  updateOrderHeader();
+}
+
+// Wire up Change Status button
+document
+  .querySelector(".schedule-btn:first-child")
+  .addEventListener("click", () => {
+    openChangeStatusModal();
+  });
+
+// SCHEDULE APPOINTMENT CLICK HANDLER
+document
+  .getElementById("schedule-appointment-btn")
+  .addEventListener("click", () => {
+    // Build summary text
+    const clinicText = clinicSelect.options[clinicSelect.selectedIndex].text;
+    const roomText = roomSelect.value;
+    const dateText = selectedDate.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    const timeText = timeSelect.options[timeSelect.selectedIndex].text;
+    const physicianText =
+      document.getElementById("ref-physician").value.trim() || "Not specified";
+
+    const summary =
+      `Clinic: ${clinicText}\n` +
+      `Room: ${roomText}\n` +
+      `Date: ${dateText}\n` +
+      `Time: ${timeText}\n` +
+      `Referring Physician: ${physicianText}`;
+
+    showConfirmModal("Schedule Appointment?", summary, () => {
+      // Update status badge to Scheduled
+      const statusBadge = document.querySelector(".status-badge");
+      statusBadge.textContent = "Scheduled";
+      statusBadge.className = "status-badge status-scheduled";
+      currentAppointmentStatus = "Scheduled";
+      updateOrderHeader();
+
+      // Hide Schedule Appointment button after confirming
+      const scheduleBtn = document.getElementById("schedule-appointment-btn");
+      scheduleBtn.style.display = "none";
+
+      // Lock clinic and room fields
+      clinicSelect.disabled = true;
+      roomSelect.disabled = true;
+
+      // Hide calendar body
+      const calendarBody = document.querySelector(".calendar-panel-body");
+      calendarBody.style.display = "none";
+
+      // Build and show appointment summary box
+      const summaryBox = document.getElementById("appointment-summary-box");
+      summaryBox.innerHTML = "";
+      summaryBox.className = "appointment-summary-box";
+
+      const examName =
+        document.querySelector("#exam-name + span")?.textContent || "Exam";
+
+      summaryBox.innerHTML = `
+      
+      <h4>Appointment Scheduled</h4>
+      <p>
+        <strong>${examName}</strong> scheduled for
+        <strong>${dateText}</strong> at <strong>${timeText}</strong>.<br>
+        <strong>Clinic:</strong> ${clinicText}<br>
+        <strong>Room:</strong> ${roomText}
+      </p>
+    `;
+
+      summaryBox.style.display = "flex";
+
+      // Enable Change Status button
+      const changeStatusBtn = document.querySelector(
+        ".schedule-btn:first-child",
+      );
+      changeStatusBtn.disabled = false;
+      changeStatusBtn.style.background = "#2563eb";
+      changeStatusBtn.style.color = "#ffffff";
+      changeStatusBtn.style.cursor = "pointer";
+    });
+  });
+
+// SAVE SLOT CLICK HANDLER
+document.getElementById("save-slot-btn").addEventListener("click", () => {
+  const saveSlotBtn = document.getElementById("save-slot-btn");
+  const scheduleBtn = document.getElementById("schedule-appointment-btn");
+
+  // Mark slot as saved
+  slotSaved = true;
+
+  // Hide Save Slot, show Schedule Appointment
+  saveSlotBtn.style.display = "none";
+  scheduleBtn.style.display = "";
+
+  // Check if sections are complete
+  updateScheduleAppointmentBtn();
+});
 
 // PHONE FORMATTING UTILITY
 
@@ -1198,8 +1544,8 @@ function checkPhysicianComplete() {
     physicianInput.value.trim() === "Unknown / Will call back";
 
   if (isProvisional) {
-    badge.textContent = "Provisional";
-    badge.className = "section-status-badge provisional";
+    badge.textContent = "Ready to Save";
+    badge.className = "section-status-badge ready";
     const saveBtn = document.getElementById("save-physician-btn");
     if (saveBtn) {
       saveBtn.disabled = false;
@@ -1219,8 +1565,8 @@ function checkPhysicianComplete() {
   const saveBtn = document.getElementById("save-physician-btn");
 
   if (isComplete) {
-    badge.textContent = "Complete";
-    badge.className = "section-status-badge complete";
+    badge.textContent = "Ready to Save";
+    badge.className = "section-status-badge ready";
     if (saveBtn) {
       saveBtn.disabled = false;
       saveBtn.style.background = "#2563eb";
@@ -1547,6 +1893,7 @@ function checkPrimaryInsuranceComplete() {
   const lastname = document.getElementById("prim-holder-lastname").value.trim();
   const dob = document.getElementById("prim-holder-dob").value;
   const saveBtn = document.getElementById("save-primary-insurance-btn");
+  const badge = document.getElementById("badge-insurance");
 
   const isProvisional = carrier === "unknown";
   const isComplete =
@@ -1564,11 +1911,15 @@ function checkPrimaryInsuranceComplete() {
     saveBtn.style.background = "#2563eb";
     saveBtn.style.color = "#ffffff";
     saveBtn.style.cursor = "pointer";
+    badge.textContent = "Ready to Save";
+    badge.className = "section-status-badge ready";
   } else {
     saveBtn.disabled = true;
     saveBtn.style.background = "#e5e7eb";
     saveBtn.style.color = "#9ca3af";
     saveBtn.style.cursor = "not-allowed";
+    badge.textContent = "Incomplete";
+    badge.className = "section-status-badge incomplete";
   }
 }
 
@@ -1623,6 +1974,7 @@ function checkSecondaryInsuranceComplete() {
   const lastname = document.getElementById("sec-holder-lastname").value.trim();
   const dob = document.getElementById("sec-holder-dob").value;
   const saveBtn = document.getElementById("save-secondary-insurance-btn");
+  const badge = document.getElementById("badge-insurance");
 
   const isComplete =
     carrier &&
@@ -1639,6 +1991,8 @@ function checkSecondaryInsuranceComplete() {
     saveBtn.style.background = "#2563eb";
     saveBtn.style.color = "#ffffff";
     saveBtn.style.cursor = "pointer";
+    badge.textContent = "Ready to Save";
+    badge.className = "section-status-badge ready";
   } else {
     saveBtn.disabled = true;
     saveBtn.style.background = "#e5e7eb";
@@ -1653,6 +2007,46 @@ function checkSecondaryInsuranceComplete() {
     .getElementById(id)
     .addEventListener("change", checkSecondaryInsuranceComplete);
 });
+
+// AUTO-FILL FOR SECONDARY INSURANCE WHEN SELF IS SELECTED
+document.getElementById("sec-relationship").addEventListener("change", () => {
+  const relationship = document.getElementById("sec-relationship").value;
+  const firstname = document.getElementById("sec-holder-firstname");
+  const lastname = document.getElementById("sec-holder-lastname");
+  const dob = document.getElementById("sec-holder-dob");
+
+  if (relationship === "self") {
+    // Auto-fill from patient form
+    firstname.value = document
+      .getElementById("patient-first-name")
+      .value.trim();
+    lastname.value = document.getElementById("patient-last-name").value.trim();
+    dob.value = document.getElementById("patient-dob").value;
+
+    // Lock fields
+    firstname.readOnly = true;
+    lastname.readOnly = true;
+    dob.readOnly = true;
+    firstname.style.background = "#f3f4f6";
+    lastname.style.background = "#f3f4f6";
+    dob.style.background = "#f3f4f6";
+  } else {
+    // Clear and unlock fields
+    firstname.value = "";
+    lastname.value = "";
+    dob.value = "";
+
+    firstname.readOnly = false;
+    lastname.readOnly = false;
+    dob.readOnly = false;
+    firstname.style.background = "#ffffff";
+    lastname.style.background = "#ffffff";
+    dob.style.background = "#ffffff";
+  }
+
+  checkSecondaryInsuranceComplete();
+});
+
 [
   "sec-member-id",
   "sec-holder-firstname",
@@ -1696,6 +2090,7 @@ function savePrimaryInsurance() {
     wrapper.appendChild(lbl);
     wrapper.appendChild(val);
     return wrapper;
+    updateScheduleAppointmentBtn();
   }
 
   const title = document.createElement("h5");
@@ -1838,8 +2233,8 @@ function savePrimaryInsurance() {
     document.getElementById("prim-holder-dob").value = dob.value;
 
     // Reset badge
-    badge.textContent = "Incomplete";
-    badge.className = "section-status-badge incomplete";
+    badge.textContent = "Ready to Save";
+    badge.className = "section-status-badge ready";
 
     // Re-attach listeners
     ["prim-carrier", "prim-relationship"].forEach((id) => {
@@ -1851,6 +2246,50 @@ function savePrimaryInsurance() {
     document
       .getElementById("prim-carrier")
       .addEventListener("change", applyProvisionalToggle);
+
+    // AUTO-FILL FOR PRIMARY INSURANCE WHEN SELF IS SELECTED
+    document
+      .getElementById("prim-relationship")
+      .addEventListener("change", () => {
+        const relationship = document.getElementById("prim-relationship").value;
+        const firstname = document.getElementById("prim-holder-firstname");
+        const lastname = document.getElementById("prim-holder-lastname");
+        const dob = document.getElementById("prim-holder-dob");
+
+        if (relationship === "self") {
+          // Auto-fill from patient form
+          firstname.value = document
+            .getElementById("patient-first-name")
+            .value.trim();
+          lastname.value = document
+            .getElementById("patient-last-name")
+            .value.trim();
+          dob.value = document.getElementById("patient-dob").value;
+
+          // Lock fields
+          firstname.readOnly = true;
+          lastname.readOnly = true;
+          dob.readOnly = true;
+          firstname.style.background = "#f3f4f6";
+          lastname.style.background = "#f3f4f6";
+          dob.style.background = "#f3f4f6";
+        } else {
+          // Clear and unlock fields
+          firstname.value = "";
+          lastname.value = "";
+          dob.value = "";
+
+          firstname.readOnly = false;
+          lastname.readOnly = false;
+          dob.readOnly = false;
+          firstname.style.background = "#ffffff";
+          lastname.style.background = "#ffffff";
+          dob.style.background = "#ffffff";
+        }
+
+        checkPrimaryInsuranceComplete();
+      });
+
     // Re-attach save button
     document
       .getElementById("save-primary-insurance-btn")
@@ -1880,6 +2319,12 @@ function saveSecondaryInsurance() {
   const carrierText = carrier.options[carrier.selectedIndex].text;
   const relationshipText =
     relationship.options[relationship.selectedIndex].text;
+
+  // Set badge to Complete after saving
+  const badge = document.getElementById("badge-insurance");
+  badge.textContent = "Complete";
+  badge.className = "section-status-badge complete";
+
   const secondarySection = document.getElementById(
     "secondary-insurance-fields",
   );
@@ -1898,6 +2343,7 @@ function saveSecondaryInsurance() {
     wrapper.appendChild(lbl);
     wrapper.appendChild(val);
     return wrapper;
+    updateScheduleAppointmentBtn();
   }
 
   const title = document.createElement("h5");
@@ -2051,6 +2497,10 @@ function saveSecondaryInsurance() {
 
   // EDIT button — restore secondary fields
   editBtn.addEventListener("click", () => {
+    const badge = document.getElementById("badge-insurance");
+    badge.textContent = "Ready to Save";
+    badge.className = "section-status-badge ready";
+
     secondarySection.innerHTML = `
       <h5 class="insurance-subsection-title">Secondary Insurance</h5>
       <div class="accordion-field">
@@ -2257,6 +2707,13 @@ document.getElementById("save-physician-btn").addEventListener("click", () => {
   viewBlock.appendChild(actionsWrapper);
   content.appendChild(viewBlock);
 
+  // Set badge to saved state
+  const badge = document.getElementById("badge-physician");
+  badge.textContent = isProvisional ? "Provisional" : "Complete";
+  badge.className = isProvisional
+    ? "section-status-badge provisional"
+    : "section-status-badge complete";
+
   // EDIT button — restore edit mode
   editBtn.addEventListener("click", () => {
     // Remove view block
@@ -2273,7 +2730,14 @@ document.getElementById("save-physician-btn").addEventListener("click", () => {
     if (selectedDoctor) {
       document.getElementById("office-field").style.display = "block";
     }
+
+    // Badge back to Ready to Save
+    const badge = document.getElementById("badge-physician");
+    badge.textContent = "Ready to Save";
+    badge.className = "section-status-badge ready";
   });
+  updateOrderHeader();
+  updateScheduleAppointmentBtn();
 });
 
 // UPLOADS SECTION
@@ -2696,4 +3160,62 @@ document.getElementById("confirmSend").addEventListener("click", () => {
 document.getElementById("cancelSend").addEventListener("click", () => {
   sendModal.classList.remove("active");
   fileToSend = null;
+});
+
+// UPDATE ORDER HEADER SUMMARY
+function updateOrderHeader() {
+  // Status
+  const statusBadge = document.querySelector(".status-badge");
+  const orderStatus = document.getElementById("order-status-1");
+  if (statusBadge && orderStatus) {
+    orderStatus.textContent = statusBadge.textContent;
+    orderStatus.className =
+      "order-status-badge " +
+      statusBadge.className.replace("status-badge ", "");
+  }
+
+  // Physician
+  const physicianInput = document.getElementById("ref-physician");
+  const orderPhysician = document.getElementById("order-physician-1");
+  if (physicianInput && orderPhysician) {
+    const name = physicianInput.value.trim();
+    orderPhysician.textContent = name
+      ? "Dr. " + name
+      : "No referring physician";
+  }
+
+  // Clinic
+  const orderClinic = document.getElementById("order-clinic-1");
+  if (orderClinic) {
+    const clinicText = clinicSelect.value
+      ? clinicSelect.options[clinicSelect.selectedIndex].text
+      : "No clinic selected";
+    orderClinic.textContent = clinicText;
+  }
+
+  // Date + Time
+  const orderDate = document.getElementById("order-date-1");
+  if (orderDate) {
+    if (selectedDate) {
+      const dateText = selectedDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+      const timeText = timeSelect.value
+        ? timeSelect.options[timeSelect.selectedIndex].text
+        : "";
+      orderDate.textContent = timeText
+        ? `${dateText} at ${timeText}`
+        : dateText;
+    } else {
+      orderDate.textContent = "No date selected";
+    }
+  }
+}
+
+// ORDER ACCORDION TOGGLE
+document.getElementById("order-header-1").addEventListener("click", () => {
+  const accordion = document.querySelector(".order-accordion");
+  accordion.classList.toggle("open");
 });

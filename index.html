@@ -250,628 +250,696 @@
 
     <!-- TEST -->
     <main class="scheduler-page">
-      <!-- MAIN GRID -->
+      <!-- ORDER ACCORDION -->
+      <div class="order-accordion">
+        <div class="order-accordion-header" id="order-header-1">
+          <div class="order-header-info">
+            <span class="order-exam-name">Screening Mammogram</span>
+            <span class="order-status-badge status-ordered" id="order-status-1"
+              >Ordered</span
+            >
+            <span class="order-meta" id="order-physician-1"
+              >No referring physician</span
+            >
+            <span class="order-meta" id="order-clinic-1"
+              >No clinic selected</span
+            >
+            <span class="order-meta" id="order-date-1">No date selected</span>
+          </div>
+          <div class="order-header-toggle">
+            <ion-icon
+              name="chevron-down-outline"
+              id="order-chevron-1"
+            ></ion-icon>
+          </div>
+        </div>
 
-      <section class="scheduler-grid">
-        <!-- COLUMN 1: ORDER / EXAM DETAILS -->
-        <aside class="scheduler-column left-column">
-          <div class="accordion">
-            <section class="accordion-section">
-              <button class="accordion-header">Exam Info</button>
-              <div class="accordion-content">
-                <div class="accordion-grid">
-                  <div class="accordion-field">
-                    <label for="exam-name">Exam Name</label>
-                    <!-- view mode -->
-                    <span>Screening Mammogram</span>
-                    <!-- edit mode -->
-                    <input id="exam-name" type="text" />
+        <div class="order-accordion-body" id="order-body-1">
+          <!-- MAIN GRID -->
+
+          <section class="scheduler-grid">
+            <!-- COLUMN 1: ORDER / EXAM DETAILS -->
+            <aside class="scheduler-column left-column">
+              <div class="accordion">
+                <section class="accordion-section">
+                  <button class="accordion-header">Exam Info</button>
+                  <div class="accordion-content">
+                    <div class="accordion-grid">
+                      <div class="accordion-field">
+                        <label for="exam-name">Exam Name</label>
+                        <!-- view mode -->
+                        <span>Screening Mammogram</span>
+                        <!-- edit mode -->
+                        <input id="exam-name" type="text" />
+                      </div>
+
+                      <div class="accordion-field">
+                        <label for="exam-date">Received on:</label>
+
+                        <!-- view mode -->
+                        <span>1/1/2025</span>
+                        <!-- edit mode -->
+                        <input id="exam-date" type="date" />
+                      </div>
+
+                      <div class="accordion-field">
+                        <label>CPT Code</label>
+                        <span>77067</span>
+                      </div>
+
+                      <div class="accordion-field">
+                        <label>ICD-10</label>
+                        <span>Z12.31</span>
+                      </div>
+
+                      <div class="accordion-field">
+                        <label>Duration</label>
+                        <span>15 minutes</span>
+                      </div>
+
+                      <div class="accordion-field">
+                        <label>Self-Pay price</label>
+                        <span>$230</span>
+                      </div>
+                    </div>
                   </div>
+                </section>
 
-                  <div class="accordion-field">
-                    <label for="exam-date">Received on:</label>
-
-                    <!-- view mode -->
-                    <span>1/1/2025</span>
-                    <!-- edit mode -->
-                    <input id="exam-date" type="date" />
+                <section class="accordion-section">
+                  <button class="accordion-header">Preparations</button>
+                  <div class="accordion-content">
+                    <span>
+                      Do not wear any cream, lotion powder, deodorant, oils or
+                      prerfume on the breast or under the arm area. Wear a 2
+                      piece outfit.
+                    </span>
                   </div>
+                </section>
 
-                  <div class="accordion-field">
-                    <label>CPT Code</label>
-                    <span>77067</span>
-                  </div>
-
-                  <div class="accordion-field">
-                    <label>ICD-10</label>
-                    <span>Z12.31</span>
-                  </div>
-
-                  <div class="accordion-field">
-                    <label>Duration</label>
-                    <span>15 minutes</span>
-                  </div>
-
-                  <div class="accordion-field">
-                    <label>Self-Pay price</label>
-                    <span>$230</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section class="accordion-section">
-              <button class="accordion-header">Preparations</button>
-              <div class="accordion-content">
-                <span>
-                  Do not wear any cream, lotion powder, deodorant, oils or
-                  prerfume on the breast or under the arm area. Wear a 2 piece
-                  outfit.
-                </span>
-              </div>
-            </section>
-
-            <section class="accordion-section">
-              <button class="accordion-header">Alerts</button>
-              <div class="accordion-content">
-                <span
-                  >If patient experiences pain, lumps or discharge on the
-                  breasts, she must have a Diagnostic Mammogram + Breast
-                  Ultrasound. If patient is under 30 years old, only schedule a
-                  Breast Ultrasound.</span
-                >
-              </div>
-            </section>
-
-            <section class="accordion-section">
-              <button class="accordion-header" id="header-physician">
-                Referring Physician
-                <span
-                  class="section-status-badge incomplete"
-                  id="badge-physician"
-                  >Incomplete</span
-                >
-              </button>
-              <div class="accordion-content">
-                <div class="accordion-field">
-                  <label for="ref-physician">Referring Physician</label>
-                  <div class="typeahead-wrapper">
-                    <input
-                      id="ref-physician"
-                      type="text"
-                      placeholder="Type doctor name..."
-                      autocomplete="off"
-                    />
-                    <ul class="typeahead-dropdown" id="physician-dropdown"></ul>
-                  </div>
-                </div>
-
-                <div class="accordion-field">
-                  <label for="npi">NPI</label>
-                  <input id="npi" type="text" placeholder="Auto-filled" />
-                </div>
-
-                <div
-                  class="accordion-field"
-                  id="office-field"
-                  style="display: none"
-                >
-                  <label for="physician-office-select">Office</label>
-                  <select id="physician-office-select">
-                    <option value="">Select office</option>
-                  </select>
-                </div>
-
-                <div class="accordion-field">
-                  <label for="physician-phone">Phone</label>
-                  <input
-                    id="physician-phone"
-                    type="tel"
-                    placeholder="Auto-filled"
-                  />
-                </div>
-
-                <div class="accordion-field">
-                  <label for="physician-fax">Fax</label>
-                  <input
-                    id="physician-fax"
-                    type="tel"
-                    placeholder="Auto-filled"
-                  />
-                </div>
-
-                <div class="accordion-actions">
-                  <div class="primary-actions">
-                    <button
-                      class="save-button"
-                      id="save-physician-btn"
-                      disabled
+                <section class="accordion-section">
+                  <button class="accordion-header">Alerts</button>
+                  <div class="accordion-content">
+                    <span
+                      >If patient experiences pain, lumps or discharge on the
+                      breasts, she must have a Diagnostic Mammogram + Breast
+                      Ultrasound. If patient is under 30 years old, only
+                      schedule a Breast Ultrasound.</span
                     >
-                      Save
-                    </button>
                   </div>
-                </div>
-              </div>
-            </section>
+                </section>
 
-            <section class="accordion-section" id="screening-section">
-              <button class="accordion-header">
-                Screening Questions
-                <span
-                  class="section-status-badge incomplete"
-                  id="badge-screening"
-                  >Incomplete</span
-                >
-              </button>
-              <div class="accordion-content" id="screening-content">
-                <!-- Questions will be injected here by JavaScript -->
-              </div>
-            </section>
-
-            <section class="accordion-section" id="insurance-section">
-              <button class="accordion-header">
-                Insurance Info
-                <span
-                  class="section-status-badge incomplete"
-                  id="badge-insurance"
-                  >Incomplete</span
-                >
-              </button>
-              <div class="accordion-content">
-                <!-- PRIMARY INSURANCE -->
-                <div class="insurance-subsection" id="primary-insurance-fields">
-                  <h5 class="insurance-subsection-title">Primary Insurance</h5>
-
-                  <div class="accordion-field">
-                    <label for="prim-carrier">Insurance Carrier</label>
-                    <select id="prim-carrier">
-                      <option value="">Select carrier</option>
-                      <option value="unknown">Unknown / Will call back</option>
-                      <option value="selfpay">Self-Pay</option>
-                      <option value="aetna">Aetna</option>
-                      <option value="bcbs">Blue Cross Blue Shield</option>
-                      <option value="health-choice">Health Choice</option>
-                      <option value="kaiser">Kaiser</option>
-                      <option value="medicare">Medicare</option>
-                      <option value="medicaid">Medicaid</option>
-                      <option value="oscar">Oscar</option>
-                      <option value="uhc">United Health Care</option>
-                      <option value="veterans">Veterans Administration</option>
-                      <option value="workcomp">Worker's Compensation</option>
-                    </select>
-                  </div>
-
-                  <div class="accordion-field">
-                    <label for="prim-member-id">Member ID</label>
-                    <input
-                      id="prim-member-id"
-                      type="text"
-                      placeholder="Member ID"
-                    />
-                  </div>
-
-                  <div class="accordion-field">
-                    <label for="prim-relationship">Relationship</label>
-                    <select id="prim-relationship">
-                      <option value="">Select relationship</option>
-                      <option value="self">Self</option>
-                      <option value="mother">Mother</option>
-                      <option value="father">Father</option>
-                      <option value="sibling">Sibling</option>
-                      <option value="spouse">Spouse</option>
-                      <option value="daughter">Daughter</option>
-                      <option value="son">Son</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div class="accordion-field">
-                    <label for="prim-holder-firstname">Holder First Name</label>
-                    <input
-                      id="prim-holder-firstname"
-                      type="text"
-                      placeholder="First Name"
-                    />
-                  </div>
-
-                  <div class="accordion-field">
-                    <label for="prim-holder-lastname">Holder Last Name</label>
-                    <input
-                      id="prim-holder-lastname"
-                      type="text"
-                      placeholder="Last Name"
-                    />
-                  </div>
-
-                  <div class="accordion-field">
-                    <label for="prim-holder-dob">Holder DOB</label>
-                    <input id="prim-holder-dob" type="date" />
-                  </div>
-
-                  <div class="accordion-actions">
-                    <div class="primary-actions">
-                      <button
-                        class="save-button"
-                        id="save-primary-insurance-btn"
-                        disabled
-                        style="
-                          background: #e5e7eb;
-                          color: #9ca3af;
-                          cursor: auto;
-                        "
-                      >
-                        Save Primary
-                      </button>
+                <section class="accordion-section">
+                  <button class="accordion-header" id="header-physician">
+                    Referring Physician
+                    <span
+                      class="section-status-badge incomplete"
+                      id="badge-physician"
+                      >Incomplete</span
+                    >
+                  </button>
+                  <div class="accordion-content">
+                    <div class="accordion-field">
+                      <label for="ref-physician">Referring Physician</label>
+                      <div class="typeahead-wrapper">
+                        <input
+                          id="ref-physician"
+                          type="text"
+                          placeholder="Type doctor name..."
+                          autocomplete="off"
+                        />
+                        <ul
+                          class="typeahead-dropdown"
+                          id="physician-dropdown"
+                        ></ul>
+                      </div>
                     </div>
-                  </div>
-                </div>
-
-                <!-- DIVIDER -->
-                <div
-                  class="insurance-divider"
-                  id="insurance-divider"
-                  style="display: none"
-                ></div>
-
-                <!-- SECONDARY INSURANCE -->
-                <div
-                  class="secondary-insurance-wrapper"
-                  id="secondary-insurance-wrapper"
-                >
-                  <div
-                    class="insurance-subsection"
-                    id="secondary-insurance-fields"
-                  >
-                    <h5 class="insurance-subsection-title">
-                      Secondary Insurance
-                    </h5>
 
                     <div class="accordion-field">
-                      <label for="sec-carrier">Insurance Carrier</label>
-                      <select id="sec-carrier">
-                        <option value="">Select carrier</option>
-                        <option value="selfpay">Self-Pay</option>
-                        <option value="aetna">Aetna</option>
-                        <option value="bcbs">Blue Cross Blue Shield</option>
-                        <option value="health-choice">Health Choice</option>
-                        <option value="kaiser">Kaiser</option>
-                        <option value="medicare">Medicare</option>
-                        <option value="medicaid">Medicaid</option>
-                        <option value="oscar">Oscar</option>
-                        <option value="uhc">United Health Care</option>
-                        <option value="veterans">
-                          Veterans Administration
-                        </option>
-                        <option value="workcomp">Worker's Compensation</option>
+                      <label for="npi">NPI</label>
+                      <input id="npi" type="text" placeholder="Auto-filled" />
+                    </div>
+
+                    <div
+                      class="accordion-field"
+                      id="office-field"
+                      style="display: none"
+                    >
+                      <label for="physician-office-select">Office</label>
+                      <select id="physician-office-select">
+                        <option value="">Select office</option>
                       </select>
                     </div>
 
                     <div class="accordion-field">
-                      <label for="sec-member-id">Member ID</label>
+                      <label for="physician-phone">Phone</label>
                       <input
-                        id="sec-member-id"
-                        type="text"
-                        placeholder="Member ID"
+                        id="physician-phone"
+                        type="tel"
+                        placeholder="Auto-filled"
                       />
                     </div>
 
                     <div class="accordion-field">
-                      <label for="sec-relationship">Relationship</label>
-                      <select id="sec-relationship">
-                        <option value="">Select relationship</option>
-                        <option value="self">Self</option>
-                        <option value="mother">Mother</option>
-                        <option value="father">Father</option>
-                        <option value="sibling">Sibling</option>
-                        <option value="spouse">Spouse</option>
-                        <option value="daughter">Daughter</option>
-                        <option value="son">Son</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-
-                    <div class="accordion-field">
-                      <label for="sec-holder-firstname"
-                        >Holder First Name</label
-                      >
+                      <label for="physician-fax">Fax</label>
                       <input
-                        id="sec-holder-firstname"
-                        type="text"
-                        placeholder="First Name"
+                        id="physician-fax"
+                        type="tel"
+                        placeholder="Auto-filled"
                       />
-                    </div>
-
-                    <div class="accordion-field">
-                      <label for="sec-holder-lastname">Holder Last Name</label>
-                      <input
-                        id="sec-holder-lastname"
-                        type="text"
-                        placeholder="Last Name"
-                      />
-                    </div>
-
-                    <div class="accordion-field">
-                      <label for="sec-holder-dob">Holder DOB</label>
-                      <input id="sec-holder-dob" type="date" />
                     </div>
 
                     <div class="accordion-actions">
                       <div class="primary-actions">
-                        <button class="edit-button" id="cancel-secondary-btn">
-                          Cancel
-                        </button>
                         <button
                           class="save-button"
-                          id="save-secondary-insurance-btn"
+                          id="save-physician-btn"
                           disabled
-                          style="
-                            background: #e5e7eb;
-                            color: #9ca3af;
-                            cursor: not-allowed;
-                          "
                         >
-                          Save Secondary
+                          Save
                         </button>
                       </div>
                     </div>
                   </div>
+                </section>
+
+                <section class="accordion-section" id="screening-section">
+                  <button class="accordion-header">
+                    Screening Questions
+                    <span
+                      class="section-status-badge incomplete"
+                      id="badge-screening"
+                      >Incomplete</span
+                    >
+                  </button>
+                  <div class="accordion-content" id="screening-content">
+                    <!-- Questions will be injected here by JavaScript -->
+                  </div>
+                </section>
+
+                <section class="accordion-section" id="insurance-section">
+                  <button class="accordion-header">
+                    Insurance Info
+                    <span
+                      class="section-status-badge incomplete"
+                      id="badge-insurance"
+                      >Incomplete</span
+                    >
+                  </button>
+                  <div class="accordion-content">
+                    <!-- PRIMARY INSURANCE -->
+                    <div
+                      class="insurance-subsection"
+                      id="primary-insurance-fields"
+                    >
+                      <h5 class="insurance-subsection-title">
+                        Primary Insurance
+                      </h5>
+
+                      <div class="accordion-field">
+                        <label for="prim-carrier">Insurance Carrier</label>
+                        <select id="prim-carrier">
+                          <option value="">Select carrier</option>
+                          <option value="unknown">
+                            Unknown / Will call back
+                          </option>
+                          <option value="selfpay">Self-Pay</option>
+                          <option value="aetna">Aetna</option>
+                          <option value="bcbs">Blue Cross Blue Shield</option>
+                          <option value="health-choice">Health Choice</option>
+                          <option value="kaiser">Kaiser</option>
+                          <option value="medicare">Medicare</option>
+                          <option value="medicaid">Medicaid</option>
+                          <option value="oscar">Oscar</option>
+                          <option value="uhc">United Health Care</option>
+                          <option value="veterans">
+                            Veterans Administration
+                          </option>
+                          <option value="workcomp">
+                            Worker's Compensation
+                          </option>
+                        </select>
+                      </div>
+
+                      <div class="accordion-field">
+                        <label for="prim-member-id">Member ID</label>
+                        <input
+                          id="prim-member-id"
+                          type="text"
+                          placeholder="Member ID"
+                        />
+                      </div>
+
+                      <div class="accordion-field">
+                        <label for="prim-relationship">Relationship</label>
+                        <select id="prim-relationship">
+                          <option value="">Select relationship</option>
+                          <option value="self">Self</option>
+                          <option value="mother">Mother</option>
+                          <option value="father">Father</option>
+                          <option value="sibling">Sibling</option>
+                          <option value="spouse">Spouse</option>
+                          <option value="daughter">Daughter</option>
+                          <option value="son">Son</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+
+                      <div class="accordion-field">
+                        <label for="prim-holder-firstname"
+                          >Holder First Name</label
+                        >
+                        <input
+                          id="prim-holder-firstname"
+                          type="text"
+                          placeholder="First Name"
+                        />
+                      </div>
+
+                      <div class="accordion-field">
+                        <label for="prim-holder-lastname"
+                          >Holder Last Name</label
+                        >
+                        <input
+                          id="prim-holder-lastname"
+                          type="text"
+                          placeholder="Last Name"
+                        />
+                      </div>
+
+                      <div class="accordion-field">
+                        <label for="prim-holder-dob">Holder DOB</label>
+                        <input id="prim-holder-dob" type="date" />
+                      </div>
+
+                      <div class="accordion-actions">
+                        <div class="primary-actions">
+                          <button
+                            class="save-button"
+                            id="save-primary-insurance-btn"
+                            disabled
+                            style="
+                              background: #e5e7eb;
+                              color: #9ca3af;
+                              cursor: auto;
+                            "
+                          >
+                            Save Primary
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- DIVIDER -->
+                    <div
+                      class="insurance-divider"
+                      id="insurance-divider"
+                      style="display: none"
+                    ></div>
+
+                    <!-- SECONDARY INSURANCE -->
+                    <div
+                      class="secondary-insurance-wrapper"
+                      id="secondary-insurance-wrapper"
+                    >
+                      <div
+                        class="insurance-subsection"
+                        id="secondary-insurance-fields"
+                      >
+                        <h5 class="insurance-subsection-title">
+                          Secondary Insurance
+                        </h5>
+
+                        <div class="accordion-field">
+                          <label for="sec-carrier">Insurance Carrier</label>
+                          <select id="sec-carrier">
+                            <option value="">Select carrier</option>
+                            <option value="selfpay">Self-Pay</option>
+                            <option value="aetna">Aetna</option>
+                            <option value="bcbs">Blue Cross Blue Shield</option>
+                            <option value="health-choice">Health Choice</option>
+                            <option value="kaiser">Kaiser</option>
+                            <option value="medicare">Medicare</option>
+                            <option value="medicaid">Medicaid</option>
+                            <option value="oscar">Oscar</option>
+                            <option value="uhc">United Health Care</option>
+                            <option value="veterans">
+                              Veterans Administration
+                            </option>
+                            <option value="workcomp">
+                              Worker's Compensation
+                            </option>
+                          </select>
+                        </div>
+
+                        <div class="accordion-field">
+                          <label for="sec-member-id">Member ID</label>
+                          <input
+                            id="sec-member-id"
+                            type="text"
+                            placeholder="Member ID"
+                          />
+                        </div>
+
+                        <div class="accordion-field">
+                          <label for="sec-relationship">Relationship</label>
+                          <select id="sec-relationship">
+                            <option value="">Select relationship</option>
+                            <option value="self">Self</option>
+                            <option value="mother">Mother</option>
+                            <option value="father">Father</option>
+                            <option value="sibling">Sibling</option>
+                            <option value="spouse">Spouse</option>
+                            <option value="daughter">Daughter</option>
+                            <option value="son">Son</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+
+                        <div class="accordion-field">
+                          <label for="sec-holder-firstname"
+                            >Holder First Name</label
+                          >
+                          <input
+                            id="sec-holder-firstname"
+                            type="text"
+                            placeholder="First Name"
+                          />
+                        </div>
+
+                        <div class="accordion-field">
+                          <label for="sec-holder-lastname"
+                            >Holder Last Name</label
+                          >
+                          <input
+                            id="sec-holder-lastname"
+                            type="text"
+                            placeholder="Last Name"
+                          />
+                        </div>
+
+                        <div class="accordion-field">
+                          <label for="sec-holder-dob">Holder DOB</label>
+                          <input id="sec-holder-dob" type="date" />
+                        </div>
+
+                        <div class="accordion-actions">
+                          <div class="primary-actions">
+                            <button
+                              class="edit-button"
+                              id="cancel-secondary-btn"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              class="save-button"
+                              id="save-secondary-insurance-btn"
+                              disabled
+                              style="
+                                background: #e5e7eb;
+                                color: #9ca3af;
+                                cursor: not-allowed;
+                              "
+                            >
+                              Save Secondary
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="accordion-section">
+                  <button class="accordion-header">Uploads</button>
+                  <div class="accordion-content">
+                    <!-- ORDER (always visible) -->
+                    <div class="upload-category always-visible">
+                      <div class="upload-header">
+                        <h5>Referring Order</h5>
+                        <label class="upload-btn">
+                          <ion-icon
+                            name="cloud-upload-outline"
+                            class="upload-icon"
+                          ></ion-icon>
+                          <input type="file" hidden multiple />
+                        </label>
+                      </div>
+
+                      <ul class="file-list"></ul>
+                    </div>
+
+                    <!-- FILTER DOCUMENT TYPE -->
+                    <div class="uploads-filter">
+                      <label for="docFilter">Filter documents:</label>
+                      <select id="docFilter">
+                        <option value=""></option>
+                        <option value="all">All</option>
+                        <option value="insurance-card">Insurance Card</option>
+                        <option value="drivers-license">
+                          Driver's License
+                        </option>
+                        <option value="authorization">
+                          Insurance Authorization
+                        </option>
+                      </select>
+                    </div>
+
+                    <!-- INSURANCE CARD -->
+                    <div class="upload-category" data-type="insurance-card">
+                      <div class="upload-header">
+                        <h5>Insurance Card</h5>
+                        <label class="upload-btn">
+                          <ion-icon
+                            name="cloud-upload-outline"
+                            class="upload-icon"
+                          ></ion-icon>
+                          <input type="file" hidden multiple />
+                        </label>
+                      </div>
+
+                      <ul class="file-list">
+                        <!-- files will go here -->
+                      </ul>
+                    </div>
+
+                    <!-- AUTHORIZATION -->
+                    <div class="upload-category" data-type="authorization">
+                      <div class="upload-header">
+                        <h5>Authorization</h5>
+                        <label class="upload-btn">
+                          <ion-icon
+                            name="cloud-upload-outline"
+                            class="upload-icon"
+                          ></ion-icon>
+                          <input type="file" hidden multiple />
+                        </label>
+                      </div>
+
+                      <ul class="file-list"></ul>
+                    </div>
+
+                    <!-- DRIVER'S LICENCE -->
+                    <div class="upload-category" data-type="drivers-license">
+                      <div class="upload-header">
+                        <h5>Drivers Licence</h5>
+                        <label class="upload-btn">
+                          <ion-icon
+                            name="cloud-upload-outline"
+                            class="upload-icon"
+                          ></ion-icon>
+                          <input type="file" hidden multiple />
+                        </label>
+                      </div>
+
+                      <ul class="file-list">
+                        <!-- files will go here -->
+                      </ul>
+                    </div>
+                    <div class="accordion-actions">
+                      <div class="primary-actions">
+                        <button class="save-button">Save</button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="accordion-section">
+                  <button class="accordion-header">Report</button>
+                  <div class="accordion-content">
+                    <!-- REPORT FILE -->
+                    <div
+                      class="upload-category always-visible"
+                      data-report-type="report"
+                    >
+                      <div class="upload-header">
+                        <h5>Exam Report</h5>
+                        <label class="upload-btn">
+                          <ion-icon
+                            name="cloud-upload-outline"
+                            class="upload-icon"
+                          ></ion-icon>
+                          <input type="file" hidden multiple />
+                        </label>
+                      </div>
+
+                      <ul class="file-list"></ul>
+                      <button class="send-btn">Send Report</button>
+                    </div>
+
+                    <!-- IMAGES -->
+                    <div
+                      class="upload-category always-visible"
+                      data-report-type="images"
+                    >
+                      <div class="upload-header">
+                        <h5>Images</h5>
+                        <label class="upload-btn">
+                          <ion-icon name="cloud-upload-outline"></ion-icon>
+                          <input type="file" hidden multiple />
+                        </label>
+                      </div>
+
+                      <ul class="file-list"></ul>
+                      <button class="send-btn">Send Images</button>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </aside>
+
+            <!-- COLUMN 2: SCHEDULING -->
+            <section class="scheduler-column center-column">
+              <!-- TOP INFO PANEL -->
+              <div class="calendar-panel">
+                <div class="calendar-panel-header">
+                  <div class="location-info">
+                    <div class="info-row">
+                      <label>Status</label>
+                      <div class="status-badge status-ordered">Ordered</div>
+                    </div>
+                    <div class="info-row zip-row">
+                      <label for="zip-code">ZIP Code</label>
+                      <input id="zip-code" type="text" />
+                    </div>
+
+                    <div class="info-row clinic-row">
+                      <label for="clinic">Clinic</label>
+                      <select id="clinic">
+                        <option value="">Select clinic</option>
+                      </select>
+                    </div>
+
+                    <div class="info-row room-row">
+                      <label for="room">Room</label>
+                      <select id="room">
+                        <option value="">Select room</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- APPOINTMENT SUMMARY BOX -->
+                <div id="appointment-summary-box" style="display: none"></div>
+
+                <!-- CALENDAR BODY -->
+                <div class="calendar-panel-body calendar-locked">
+                  <p class="calendar-locked-message">
+                    Select a clinic and room to enable scheduling
+                  </p>
+                  <div class="calendar-container">
+                    <div class="calendar">
+                      <div class="calendar-header">
+                        <button id="prev-month">
+                          <ion-icon name="chevron-back-outline"></ion-icon>
+                        </button>
+
+                        <h3 id="month-label"></h3>
+
+                        <button id="next-month">
+                          <ion-icon name="chevron-forward-outline"></ion-icon>
+                        </button>
+                      </div>
+
+                      <div class="calendar-weekdays">
+                        <span>Sun</span>
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
+                      </div>
+
+                      <div class="calendar-grid" id="calendar-grid"></div>
+                    </div>
+                  </div>
+
+                  <div class="time-selection">
+                    <label for="select-time">Select a Time</label>
+                    <select id="select-time" disabled>
+                      <option value="">--:--</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- FOOTER: STATUS + ACTION -->
+                <div class="calendar-panel-footer">
+                  <button class="schedule-btn">Change Status</button>
+                  <button class="schedule-btn" id="save-slot-btn" disabled>
+                    Save slot
+                  </button>
+                  <button
+                    class="schedule-btn"
+                    id="schedule-appointment-btn"
+                    disabled
+                    style="
+                      display: none;
+                      background: #e5e7eb;
+                      color: #9ca3af;
+                      cursor: not-allowed;
+                    "
+                  >
+                    Schedule Appointment
+                  </button>
                 </div>
               </div>
             </section>
 
-            <section class="accordion-section">
-              <button class="accordion-header">Uploads</button>
-              <div class="accordion-content">
-                <!-- ORDER (always visible) -->
-                <div class="upload-category always-visible">
-                  <div class="upload-header">
-                    <h5>Referring Order</h5>
-                    <label class="upload-btn">
-                      <ion-icon
-                        name="cloud-upload-outline"
-                        class="upload-icon"
-                      ></ion-icon>
-                      <input type="file" hidden multiple />
-                    </label>
-                  </div>
+            <!-- COLUMN 3: STATUS & NOTES -->
+            <aside class="scheduler-column right-column">
+              <div class="notes-header">
+                <h3>Notes</h3>
 
-                  <ul class="file-list"></ul>
-                </div>
-
-                <!-- FILTER DOCUMENT TYPE -->
-                <div class="uploads-filter">
-                  <label for="docFilter">Filter documents:</label>
-                  <select id="docFilter">
-                    <option value=""></option>
-                    <option value="all">All</option>
-                    <option value="insurance-card">Insurance Card</option>
-                    <option value="drivers-license">Driver's License</option>
-                    <option value="authorization">
-                      Insurance Authorization
-                    </option>
-                  </select>
-                </div>
-
-                <!-- INSURANCE CARD -->
-                <div class="upload-category" data-type="insurance-card">
-                  <div class="upload-header">
-                    <h5>Insurance Card</h5>
-                    <label class="upload-btn">
-                      <ion-icon
-                        name="cloud-upload-outline"
-                        class="upload-icon"
-                      ></ion-icon>
-                      <input type="file" hidden multiple />
-                    </label>
-                  </div>
-
-                  <ul class="file-list">
-                    <!-- files will go here -->
-                  </ul>
-                </div>
-
-                <!-- AUTHORIZATION -->
-                <div class="upload-category" data-type="authorization">
-                  <div class="upload-header">
-                    <h5>Authorization</h5>
-                    <label class="upload-btn">
-                      <ion-icon
-                        name="cloud-upload-outline"
-                        class="upload-icon"
-                      ></ion-icon>
-                      <input type="file" hidden multiple />
-                    </label>
-                  </div>
-
-                  <ul class="file-list"></ul>
-                </div>
-
-                <!-- DRIVER'S LICENCE -->
-                <div class="upload-category" data-type="drivers-license">
-                  <div class="upload-header">
-                    <h5>Drivers Licence</h5>
-                    <label class="upload-btn">
-                      <ion-icon
-                        name="cloud-upload-outline"
-                        class="upload-icon"
-                      ></ion-icon>
-                      <input type="file" hidden multiple />
-                    </label>
-                  </div>
-
-                  <ul class="file-list">
-                    <!-- files will go here -->
-                  </ul>
-                </div>
-                <div class="accordion-actions">
-                  <div class="primary-actions">
-                    <button class="save-button">Save</button>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section class="accordion-section">
-              <button class="accordion-header">Report</button>
-              <div class="accordion-content">
-                <!-- REPORT FILE -->
-                <div
-                  class="upload-category always-visible"
-                  data-report-type="report"
-                >
-                  <div class="upload-header">
-                    <h5>Exam Report</h5>
-                    <label class="upload-btn">
-                      <ion-icon
-                        name="cloud-upload-outline"
-                        class="upload-icon"
-                      ></ion-icon>
-                      <input type="file" hidden multiple />
-                    </label>
-                  </div>
-
-                  <ul class="file-list"></ul>
-                  <button class="send-btn">Send Report</button>
-                </div>
-
-                <!-- IMAGES -->
-                <div
-                  class="upload-category always-visible"
-                  data-report-type="images"
-                >
-                  <div class="upload-header">
-                    <h5>Images</h5>
-                    <label class="upload-btn">
-                      <ion-icon name="cloud-upload-outline"></ion-icon>
-                      <input type="file" hidden multiple />
-                    </label>
-                  </div>
-
-                  <ul class="file-list"></ul>
-                  <button class="send-btn">Send Images</button>
-                </div>
-              </div>
-            </section>
-          </div>
-        </aside>
-
-        <!-- COLUMN 2: SCHEDULING -->
-        <section class="scheduler-column center-column">
-          <!-- TOP INFO PANEL -->
-          <div class="calendar-panel">
-            <div class="calendar-panel-header">
-              <div class="location-info">
-                <div class="info-row">
-                  <label>Status</label>
-                  <div class="status-badge status-ordered">Ordered</div>
-                </div>
-                <div class="info-row zip-row">
-                  <label for="zip-code">ZIP Code</label>
-                  <input id="zip-code" type="text" />
-                </div>
-
-                <div class="info-row clinic-row">
-                  <label for="clinic">Clinic</label>
-                  <select id="clinic">
-                    <option value="">Select clinic</option>
-                  </select>
-                </div>
-
-                <div class="info-row room-row">
-                  <label for="room">Room</label>
-                  <select id="room">
-                    <option value="">Select room</option>
+                <div class="notes-actions">
+                  <button class="add-note-btn">Add note</button>
+                  <button class="view-all-notes-btn">View all</button>
+                  <select class="notes-sort">
+                    <option value="newest" selected>Newest first</option>
+                    <option value="oldest">Oldest first</option>
                   </select>
                 </div>
               </div>
-            </div>
 
-            <!-- CALENDAR BODY -->
-            <div class="calendar-panel-body calendar-locked">
-              <p class="calendar-locked-message">
-                Select a clinic and room to enable scheduling
-              </p>
-              <div class="calendar-container">
-                <div class="calendar">
-                  <div class="calendar-header">
-                    <button id="prev-month">
-                      <ion-icon name="chevron-back-outline"></ion-icon>
-                    </button>
-
-                    <h3 id="month-label"></h3>
-
-                    <button id="next-month">
-                      <ion-icon name="chevron-forward-outline"></ion-icon>
-                    </button>
+              <div class="notes-list">
+                <!-- Single note (example / placeholder) -->
+                <div class="note-card">
+                  <div class="note-meta">
+                    <span class="note-author">Scheduler – Cozy Badger</span>
+                    <span class="note-time">Jan 10, 2026 · 5:32 PM</span>
                   </div>
 
-                  <div class="calendar-weekdays">
-                    <span>Sun</span>
-                    <span>Mon</span>
-                    <span>Tue</span>
-                    <span>Wed</span>
-                    <span>Thu</span>
-                    <span>Fri</span>
-                    <span>Sat</span>
+                  <div class="note-content" data-note></div>
+                  <div class="notes-actions">
+                    <button class="delete-note-btn">Delete</button>
                   </div>
-
-                  <div class="calendar-grid" id="calendar-grid"></div>
                 </div>
               </div>
-
-              <div class="time-selection">
-                <label for="select-time">Select a Time</label>
-                <select id="select-time" disabled>
-                  <option value="">--:--</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- FOOTER: STATUS + ACTION -->
-            <div class="calendar-panel-footer">
-              <button class="schedule-btn">Change Status</button>
-              <button class="schedule-btn" id="save-slot-btn" disabled>
-                Save slot
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- COLUMN 3: STATUS & NOTES -->
-        <aside class="scheduler-column right-column">
-          <div class="notes-header">
-            <h3>Notes</h3>
-
-            <div class="notes-actions">
-              <button class="add-note-btn">Add note</button>
-              <button class="view-all-notes-btn">View all</button>
-              <select class="notes-sort">
-                <option value="newest" selected>Newest first</option>
-                <option value="oldest">Oldest first</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="notes-list">
-            <!-- Single note (example / placeholder) -->
-            <div class="note-card">
-              <div class="note-meta">
-                <span class="note-author">Scheduler – Cozy Badger</span>
-                <span class="note-time">Jan 10, 2026 · 5:32 PM</span>
-              </div>
-
-              <div class="note-content" data-note></div>
-              <div class="notes-actions">
-                <button class="delete-note-btn">Delete</button>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </section>
-
-      <!-- TEST -->
-
-      <!-- END -->
+            </aside>
+          </section>
+        </div>
+        <!-- end order-accordion-body -->
+      </div>
+      <!-- end order-accordion -->
     </main>
 
     <script
@@ -1011,6 +1079,90 @@
         <div class="send-actions">
           <button id="cancelSend">Cancel</button>
           <button id="confirmSend">Send</button>
+        </div>
+      </div>
+    </div>
+    <!-- CHANGE STATUS MODAL -->
+    <div id="changeStatusModal" class="modal-backdrop">
+      <div class="delete-modal" style="width: 400px">
+        <h3>Change Status</h3>
+
+        <div style="margin-top: 1.2rem">
+          <label
+            style="
+              font-size: 1.2rem;
+              font-weight: 600;
+              color: #6b7280;
+              display: block;
+              margin-bottom: 0.4rem;
+            "
+          >
+            Select new status
+          </label>
+          <select
+            id="statusChangeSelect"
+            style="
+              width: 100%;
+              font-size: 1.3rem;
+              padding: 0.6rem 0.75rem;
+              border-radius: 8px;
+              border: 1px solid #d1d5db;
+            "
+          >
+            <option value="">Select an option</option>
+          </select>
+        </div>
+
+        <div style="margin-top: 1.2rem">
+          <label
+            style="
+              font-size: 1.2rem;
+              font-weight: 600;
+              color: #6b7280;
+              display: block;
+              margin-bottom: 0.4rem;
+            "
+          >
+            Reason for status change
+          </label>
+          <textarea
+            id="statusChangeReason"
+            rows="4"
+            placeholder="Please explain the reason for this change..."
+            style="
+              width: 100%;
+              font-size: 1.3rem;
+              padding: 0.6rem 0.75rem;
+              border-radius: 8px;
+              border: 1px solid #d1d5db;
+              resize: vertical;
+              font-family: inherit;
+              box-sizing: border-box;
+            "
+          ></textarea>
+          <div
+            id="statusChangeCharCount"
+            style="
+              font-size: 1.1rem;
+              color: #9ca3af;
+              text-align: right;
+              margin-top: 0.3rem;
+            "
+          >
+            0 / 20 characters minimum
+          </div>
+        </div>
+
+        <div class="delete-actions" style="margin-top: 1.2rem">
+          <button id="cancelStatusChange">Cancel</button>
+          <button
+            id="confirmStatusChange"
+            class="save-button"
+            disabled
+            style="background: #e5e7eb; color: #9ca3af; cursor: not-allowed"
+          >
+            Save Status Change
+          </button>
         </div>
       </div>
     </div>
