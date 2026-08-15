@@ -418,13 +418,12 @@ clinicSelect.addEventListener("change", () => {
 
 // TOGGLE ACCORDEON
 
-const accordionHeaders = document.querySelectorAll(".accordion-header");
+document.addEventListener("click", (e) => {
+  const header = e.target.closest(".accordion-header");
+  if (!header) return;
 
-accordionHeaders.forEach((header) => {
-  header.addEventListener("click", () => {
-    const section = header.parentElement;
-    section.classList.toggle("open");
-  });
+  const section = header.parentElement;
+  section.classList.toggle("open");
 });
 
 // NOTES SECTION (INLINE, APPEND-ONLY)
@@ -3250,7 +3249,1073 @@ function updateOrderHeader() {
 }
 
 // ORDER ACCORDION TOGGLE
-document.getElementById("order-header-1").addEventListener("click", () => {
-  const accordion = document.querySelector(".order-accordion");
-  accordion.classList.toggle("open");
-});
+initOrderHeader(1);
+
+//---------------REFACTOR----------
+// ================================
+// MULTI-ORDER SUPPORT (PHASE 2)
+// ================================
+
+function createOrderHeaderHTML(orderId) {
+  return `
+    <div class="order-accordion-header" id="order-header-${orderId}">
+      <div class="order-header-info">
+        <span class="order-exam-name">Screening Mammogram</span>
+        <span class="order-status-badge status-ordered" id="order-status-${orderId}">Ordered</span>
+        <span class="order-meta" id="order-physician-${orderId}">No referring physician</span>
+        <span class="order-meta" id="order-clinic-${orderId}">No clinic selected</span>
+        <span class="order-meta" id="order-date-${orderId}">No date selected</span>
+      </div>
+      <div class="order-header-toggle">
+        <ion-icon name="chevron-down-outline" id="order-chevron-${orderId}"></ion-icon>
+      </div>
+    </div>
+  `;
+}
+
+function createOrderWrapperHTML(orderId) {
+  return `
+    <div class="order-accordion" id="order-accordion-${orderId}">
+      ${createOrderHeaderHTML(orderId)}
+      <div class="order-accordion-body" id="order-body-${orderId}">
+        <p style="padding: 2rem;">Placeholder content for order ${orderId}</p>
+      </div>
+    </div>
+  `;
+}
+
+function createExamInfoHTML(orderId) {
+  return `
+    <section class="accordion-section">
+      <button class="accordion-header">Exam Info</button>
+      <div class="accordion-content">
+        <div class="accordion-grid">
+          <div class="accordion-field">
+            <label for="exam-name-${orderId}">Exam Name</label>
+            <span>Screening Mammogram</span>
+            <input id="exam-name-${orderId}" type="text" />
+          </div>
+
+          <div class="accordion-field">
+            <label for="exam-date-${orderId}">Received on:</label>
+            <span>1/1/2025</span>
+            <input id="exam-date-${orderId}" type="date" />
+          </div>
+
+          <div class="accordion-field">
+            <label>CPT Code</label>
+            <span>77067</span>
+          </div>
+
+          <div class="accordion-field">
+            <label>ICD-10</label>
+            <span>Z12.31</span>
+          </div>
+
+          <div class="accordion-field">
+            <label>Duration</label>
+            <span>15 minutes</span>
+          </div>
+
+          <div class="accordion-field">
+            <label>Self-Pay price</label>
+            <span>$230</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="accordion-section">
+      <button class="accordion-header">Preparations</button>
+      <div class="accordion-content">
+        <span>
+          Do not wear any cream, lotion powder, deodorant, oils or
+          prerfume on the breast or under the arm area. Wear a 2
+          piece outfit.
+        </span>
+      </div>
+    </section>
+
+    <section class="accordion-section">
+      <button class="accordion-header">Alerts</button>
+      <div class="accordion-content">
+        <span>If patient experiences pain, lumps or discharge on the
+          breasts, she must have a Diagnostic Mammogram + Breast
+          Ultrasound. If patient is under 30 years old, only
+          schedule a Breast Ultrasound.</span>
+      </div>
+    </section>
+  `;
+}
+
+function createReferringPhysicianHTML(orderId) {
+  return `
+    <section class="accordion-section">
+      <button class="accordion-header" id="header-physician-${orderId}">
+        Referring Physician
+        <span class="section-status-badge incomplete" id="badge-physician-${orderId}">Incomplete</span>
+      </button>
+      <div class="accordion-content">
+        <div class="accordion-field">
+          <label for="ref-physician-${orderId}">Referring Physician</label>
+          <div class="typeahead-wrapper">
+            <input
+              id="ref-physician-${orderId}"
+              type="text"
+              placeholder="Type doctor name..."
+              autocomplete="off"
+            />
+            <ul class="typeahead-dropdown" id="physician-dropdown-${orderId}"></ul>
+          </div>
+        </div>
+
+        <div class="accordion-field">
+          <label for="npi-${orderId}">NPI</label>
+          <input id="npi-${orderId}" type="text" placeholder="Auto-filled" />
+        </div>
+
+        <div class="accordion-field" id="office-field-${orderId}" style="display: none">
+          <label for="physician-office-select-${orderId}">Office</label>
+          <select id="physician-office-select-${orderId}">
+            <option value="">Select office</option>
+          </select>
+        </div>
+
+        <div class="accordion-field">
+          <label for="physician-phone-${orderId}">Phone</label>
+          <input id="physician-phone-${orderId}" type="tel" placeholder="Auto-filled" />
+        </div>
+
+        <div class="accordion-field">
+          <label for="physician-fax-${orderId}">Fax</label>
+          <input id="physician-fax-${orderId}" type="tel" placeholder="Auto-filled" />
+        </div>
+
+        <div class="accordion-actions">
+          <div class="primary-actions">
+            <button class="save-button" id="save-physician-btn-${orderId}" disabled>
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function createScreeningHTML(orderId) {
+  return `
+    <section class="accordion-section" id="screening-section-${orderId}">
+      <button class="accordion-header">
+        Screening Questions
+        <span class="section-status-badge incomplete" id="badge-screening-${orderId}">Incomplete</span>
+      </button>
+      <div class="accordion-content" id="screening-content-${orderId}">
+        <!-- Questions will be injected here by JavaScript -->
+      </div>
+    </section>
+  `;
+}
+
+function initScreeningSection(orderId, examType = "mammogram") {
+  const content = document.getElementById(`screening-content-${orderId}`);
+  const badge = document.getElementById(`badge-screening-${orderId}`);
+
+  function renderScreeningQuestions(examType) {
+    content.innerHTML = "";
+
+    const questions = screeningQuestions[examType];
+    if (!questions) return;
+
+    questions.forEach((question, index) => {
+      const field = document.createElement("div");
+      field.className = "accordion-field";
+
+      const label = document.createElement("label");
+      label.setAttribute("for", `sq-${orderId}-${index}`);
+      label.textContent = question;
+
+      const input = document.createElement("input");
+      input.id = `sq-${orderId}-${index}`;
+      input.type = "text";
+      input.dataset.sqIndex = index;
+
+      input.addEventListener("input", checkScreeningComplete);
+
+      field.appendChild(label);
+      field.appendChild(input);
+      content.appendChild(field);
+    });
+
+    const actions = document.createElement("div");
+    actions.className = "accordion-actions";
+    actions.innerHTML = `
+      <div class="primary-actions">
+        <button class="save-button" id="save-screening-btn-${orderId}" disabled
+          style="background:#e5e7eb; color:#9ca3af; cursor: auto;">
+          Save
+        </button>
+      </div>
+    `;
+    content.appendChild(actions);
+
+    content.dataset.currentExam = examType;
+
+    document
+      .getElementById(`save-screening-btn-${orderId}`)
+      .addEventListener("click", saveScreeningQuestions);
+  }
+
+  function saveScreeningQuestions() {
+    const inputs = content.querySelectorAll("input[data-sq-index]");
+
+    const answers = [];
+    inputs.forEach((input) => {
+      answers.push({
+        question: input.previousElementSibling.textContent,
+        answer: input.value.trim(),
+      });
+    });
+
+    content.innerHTML = "";
+
+    const summary = document.createElement("div");
+    summary.className = "screening-summary";
+    summary.id = `screening-summary-${orderId}`;
+
+    answers.forEach(({ question, answer }) => {
+      const field = document.createElement("div");
+      field.className = "physician-view-field";
+
+      const lbl = document.createElement("label");
+      lbl.textContent = question;
+
+      const val = document.createElement("span");
+      val.textContent = answer;
+
+      field.appendChild(lbl);
+      field.appendChild(val);
+      summary.appendChild(field);
+    });
+
+    const actions = document.createElement("div");
+    actions.className = "accordion-actions";
+    actions.innerHTML = `
+      <div class="primary-actions">
+        <button class="edit-button" id="edit-screening-btn-${orderId}">Edit</button>
+      </div>
+    `;
+
+    summary.appendChild(actions);
+    content.appendChild(summary);
+
+    badge.textContent = "Complete";
+    badge.className = "section-status-badge complete";
+
+    document
+      .getElementById(`edit-screening-btn-${orderId}`)
+      .addEventListener("click", () => {
+        const currentExam = content.dataset.currentExam || "mammogram";
+        renderScreeningQuestions(currentExam);
+
+        const newInputs = content.querySelectorAll("input[data-sq-index]");
+        newInputs.forEach((input, i) => {
+          input.value = answers[i]?.answer || "";
+        });
+
+        badge.textContent = "Ready to Save";
+        badge.className = "section-status-badge ready";
+
+        checkScreeningComplete();
+      });
+
+    updateScheduleAppointmentBtn();
+  }
+
+  function checkScreeningComplete() {
+    const inputs = content.querySelectorAll("input[data-sq-index]");
+    const saveBtn = document.getElementById(`save-screening-btn-${orderId}`);
+
+    if (!saveBtn) return;
+
+    const allFilled = Array.from(inputs).every(
+      (input) => input.value.trim() !== "",
+    );
+
+    if (allFilled) {
+      saveBtn.disabled = false;
+      saveBtn.style.background = "#2563eb";
+      saveBtn.style.color = "#ffffff";
+      saveBtn.style.cursor = "pointer";
+      badge.textContent = "Ready to Save";
+      badge.className = "section-status-badge ready";
+    } else {
+      saveBtn.disabled = true;
+      saveBtn.style.background = "#e5e7eb";
+      saveBtn.style.color = "#9ca3af";
+      saveBtn.style.cursor = "not-allowed";
+      badge.textContent = "Incomplete";
+      badge.className = "section-status-badge incomplete";
+    }
+  }
+
+  renderScreeningQuestions(examType);
+}
+
+function initPhysicianSection(orderId) {
+  const physicianInput = document.getElementById(`ref-physician-${orderId}`);
+  const physicianDropdown = document.getElementById(
+    `physician-dropdown-${orderId}`,
+  );
+  const officeField = document.getElementById(`office-field-${orderId}`);
+  const officeSelect = document.getElementById(
+    `physician-office-select-${orderId}`,
+  );
+
+  let selectedDoctor = null;
+  let isNewDoctor = false;
+
+  function setPhysicianFields(editable) {
+    [`physician-phone-${orderId}`, `physician-fax-${orderId}`].forEach((id) => {
+      const field = document.getElementById(id);
+      field.readOnly = !editable;
+      field.style.background = editable ? "#ffffff" : "#f3f4f6";
+      if (!editable) field.value = "";
+    });
+
+    const npi = document.getElementById(`npi-${orderId}`);
+    npi.readOnly = !editable;
+    npi.style.background = editable ? "#ffffff" : "#f3f4f6";
+  }
+
+  function clearPhysicianFields() {
+    physicianInput.readOnly = false;
+    physicianInput.style.background = "#ffffff";
+    physicianInput.value = "";
+
+    setPhysicianFields(false);
+    document.getElementById(`npi-${orderId}`).value = "";
+    officeField.style.display = "none";
+    officeSelect.innerHTML = `<option value="">Select office</option>`;
+    selectedDoctor = null;
+    isNewDoctor = false;
+    checkPhysicianComplete();
+  }
+
+  function fillPhysicianFields(office) {
+    document.getElementById(`physician-phone-${orderId}`).value = office.phone;
+    document.getElementById(`physician-fax-${orderId}`).value = office.fax;
+    checkPhysicianComplete();
+  }
+
+  function renderDropdown(query) {
+    physicianDropdown.innerHTML = "";
+
+    const matches = doctors.filter((dr) =>
+      dr.name.toLowerCase().startsWith(query.toLowerCase()),
+    );
+
+    matches.forEach((dr) => {
+      const li = document.createElement("li");
+      li.textContent = dr.name;
+      li.addEventListener("mousedown", () => {
+        selectDoctor(dr);
+      });
+      physicianDropdown.appendChild(li);
+    });
+
+    const unknownLi = document.createElement("li");
+    unknownLi.textContent = "Unknown / Will call back";
+    unknownLi.className = "typeahead-provisional";
+    unknownLi.addEventListener("mousedown", () => {
+      selectProvisional();
+    });
+    physicianDropdown.appendChild(unknownLi);
+
+    const addNewLi = document.createElement("li");
+    addNewLi.textContent = "+ Add new doctor";
+    addNewLi.className = "typeahead-special";
+    addNewLi.addEventListener("mousedown", () => {
+      selectAddNew();
+    });
+    physicianDropdown.appendChild(addNewLi);
+
+    physicianDropdown.classList.add("open");
+  }
+
+  function selectDoctor(dr) {
+    selectedDoctor = dr;
+    isNewDoctor = false;
+
+    physicianInput.value = dr.name;
+    physicianInput.readOnly = true;
+    physicianInput.style.background = "#f3f4f6";
+
+    physicianDropdown.classList.remove("open");
+
+    setPhysicianFields(false);
+    document.getElementById(`npi-${orderId}`).value = dr.npi;
+
+    officeSelect.innerHTML = `<option value="">Select office</option>`;
+    dr.offices.forEach((office, index) => {
+      const option = document.createElement("option");
+      option.value = index;
+      option.textContent = office.label + " — " + office.address;
+      officeSelect.appendChild(option);
+    });
+
+    const addOfficeOption = document.createElement("option");
+    addOfficeOption.value = "new-office";
+    addOfficeOption.textContent = "+ Add new office";
+    addOfficeOption.style.color = "#2563eb";
+    addOfficeOption.style.fontWeight = "600";
+    officeSelect.appendChild(addOfficeOption);
+
+    officeField.style.display = "block";
+
+    if (dr.offices.length === 1) {
+      officeSelect.value = "0";
+      fillPhysicianFields(dr.offices[0]);
+    }
+
+    checkPhysicianComplete();
+  }
+
+  function selectProvisional() {
+    physicianInput.value = "Unknown / Will call back";
+    physicianInput.readOnly = true;
+    physicianInput.style.background = "#f3f4f6";
+    physicianDropdown.classList.remove("open");
+    officeField.style.display = "none";
+    setPhysicianFields(false);
+    document.getElementById(`npi-${orderId}`).value = "";
+    selectedDoctor = null;
+    isNewDoctor = false;
+    checkPhysicianComplete();
+  }
+
+  function selectAddNew() {
+    physicianInput.value = "";
+    physicianInput.readOnly = false;
+    physicianInput.style.background = "#ffffff";
+    physicianDropdown.classList.remove("open");
+    officeField.style.display = "none";
+    selectedDoctor = null;
+    isNewDoctor = true;
+    setPhysicianFields(false);
+    document.getElementById(`npi-${orderId}`).value = "";
+    checkPhysicianComplete();
+    buildNewDoctorForm();
+  }
+
+  physicianInput.addEventListener("click", () => {
+    if (physicianInput.readOnly) {
+      if (physicianInput.dataset.formOpen === "true") return;
+      clearPhysicianFields();
+      physicianInput.focus();
+      renderDropdown("");
+    }
+  });
+
+  physicianInput.addEventListener("input", () => {
+    if (physicianInput.readOnly) return;
+    const query = physicianInput.value.trim();
+    if (query.length === 0) {
+      physicianDropdown.classList.remove("open");
+      return;
+    }
+    renderDropdown(query);
+  });
+
+  physicianInput.addEventListener("focus", () => {
+    if (physicianInput.readOnly) return;
+    if (physicianInput.value.trim().length > 0) {
+      renderDropdown(physicianInput.value.trim());
+    }
+  });
+
+  physicianInput.addEventListener("blur", () => {
+    setTimeout(() => {
+      physicianDropdown.classList.remove("open");
+    }, 150);
+  });
+
+  officeSelect.addEventListener("change", () => {
+    const index = officeSelect.value;
+
+    if (index === "") {
+      document.getElementById(`physician-phone-${orderId}`).value = "";
+      document.getElementById(`physician-fax-${orderId}`).value = "";
+      setPhysicianFields(false);
+
+      const existingForm = document.getElementById(
+        `new-office-form-${orderId}`,
+      );
+      if (existingForm) existingForm.remove();
+
+      const existingSaveBtn = document.getElementById(
+        `save-new-office-btn-${orderId}`,
+      );
+      if (existingSaveBtn) existingSaveBtn.remove();
+
+      checkPhysicianComplete();
+      return;
+    }
+
+    if (index === "new-office") {
+      document.getElementById(`physician-phone-${orderId}`).value = "";
+      document.getElementById(`physician-fax-${orderId}`).value = "";
+
+      const phone = document.getElementById(`physician-phone-${orderId}`);
+      const fax = document.getElementById(`physician-fax-${orderId}`);
+      phone.readOnly = false;
+      phone.style.background = "#ffffff";
+      fax.readOnly = false;
+      fax.style.background = "#ffffff";
+
+      let newOfficeForm = document.getElementById(`new-office-form-${orderId}`);
+      if (!newOfficeForm) {
+        newOfficeForm = document.createElement("div");
+        newOfficeForm.id = `new-office-form-${orderId}`;
+        newOfficeForm.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          gap: 0.6rem;
+          margin-top: 0.6rem;
+        `;
+
+        const addressInput = document.createElement("input");
+        addressInput.id = `new-office-address-${orderId}`;
+        addressInput.type = "text";
+        addressInput.placeholder = "Office address";
+        addressInput.style.cssText = `
+          font-size: 1.3rem;
+          padding: 0.6rem 0.75rem;
+          border-radius: 8px;
+          border: 1px solid #d1d5db;
+          background: #ffffff;
+        `;
+
+        const saveOfficeBtn = document.createElement("button");
+        saveOfficeBtn.id = `save-new-office-btn-${orderId}`;
+        saveOfficeBtn.type = "button";
+        saveOfficeBtn.disabled = true;
+        saveOfficeBtn.textContent = "Save office";
+        saveOfficeBtn.style.cssText = `
+          align-self: flex-start;
+          padding: 0.5rem 1.2rem;
+          border-radius: 8px;
+          border: none;
+          background: #e5e7eb;
+          color: #9ca3af;
+          font-size: 1.2rem;
+          font-weight: 600;
+          cursor: not-allowed;
+        `;
+
+        const addressLabel = document.createElement("label");
+        addressLabel.textContent = "Office Address";
+        addressLabel.style.cssText = `
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #6b7280;
+        `;
+
+        newOfficeForm.appendChild(addressLabel);
+        newOfficeForm.appendChild(addressInput);
+
+        const phoneField = document.getElementById(
+          `physician-phone-${orderId}`,
+        );
+        const faxField = document.getElementById(`physician-fax-${orderId}`);
+        const phoneWrapper = phoneField.closest(".accordion-field");
+        const faxWrapper = faxField.closest(".accordion-field");
+
+        function updateSaveOfficeBtn() {
+          const address = addressInput.value.trim();
+          const phoneVal = phoneField.value.replace(/\D/g, "");
+          const faxVal = faxField.value.replace(/\D/g, "");
+
+          const isReady =
+            address.length > 0 &&
+            phoneVal.length === 10 &&
+            faxVal.length === 10;
+
+          saveOfficeBtn.disabled = !isReady;
+          saveOfficeBtn.style.background = isReady ? "#2563eb" : "#e5e7eb";
+          saveOfficeBtn.style.color = isReady ? "#ffffff" : "#9ca3af";
+          saveOfficeBtn.style.cursor = isReady ? "pointer" : "not-allowed";
+        }
+
+        addressInput.addEventListener("input", updateSaveOfficeBtn);
+        phoneField.addEventListener("input", updateSaveOfficeBtn);
+        faxField.addEventListener("input", updateSaveOfficeBtn);
+
+        phoneWrapper.before(newOfficeForm);
+
+        saveOfficeBtn.style.marginTop = "0.8rem";
+        faxWrapper.after(saveOfficeBtn);
+
+        saveOfficeBtn.addEventListener("click", () => {
+          const address = addressInput.value.trim();
+          const newPhone = phoneField.value.trim();
+          const newFax = faxField.value.trim();
+
+          const summary =
+            `Address: ${address}\n` + `Phone: ${newPhone}\n` + `Fax: ${newFax}`;
+
+          showConfirmModal("Add new office?", summary, () => {
+            const newOffice = {
+              label: "New Office",
+              address,
+              phone: newPhone,
+              fax: newFax,
+            };
+
+            selectedDoctor.offices.push(newOffice);
+            const newIndex = selectedDoctor.offices.length - 1;
+
+            const addOfficeOption = officeSelect.querySelector(
+              "[value='new-office']",
+            );
+            const newOption = document.createElement("option");
+            newOption.value = newIndex;
+            newOption.textContent = newOffice.label + " — " + newOffice.address;
+            officeSelect.insertBefore(newOption, addOfficeOption);
+
+            officeSelect.value = newIndex;
+
+            phoneField.readOnly = true;
+            phoneField.style.background = "#f3f4f6";
+            faxField.readOnly = true;
+            faxField.style.background = "#f3f4f6";
+
+            newOfficeForm.remove();
+            saveOfficeBtn.remove();
+
+            checkPhysicianComplete();
+          });
+        });
+      }
+
+      phone.focus();
+      checkPhysicianComplete();
+      return;
+    }
+
+    const existingForm = document.getElementById(`new-office-form-${orderId}`);
+    if (existingForm) existingForm.remove();
+
+    const existingSaveBtn = document.getElementById(
+      `save-new-office-btn-${orderId}`,
+    );
+    if (existingSaveBtn) existingSaveBtn.remove();
+
+    if (!selectedDoctor) return;
+    setPhysicianFields(false);
+    fillPhysicianFields(selectedDoctor.offices[index]);
+  });
+
+  function checkPhysicianComplete() {
+    const badge = document.getElementById(`badge-physician-${orderId}`);
+    if (!badge) return;
+
+    const isProvisional =
+      physicianInput.value.trim() === "Unknown / Will call back";
+
+    if (isProvisional) {
+      badge.textContent = "Ready to Save";
+      badge.className = "section-status-badge ready";
+      const saveBtn = document.getElementById(`save-physician-btn-${orderId}`);
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.style.background = "#2563eb";
+        saveBtn.style.color = "#ffffff";
+        saveBtn.style.cursor = "pointer";
+      }
+      return;
+    }
+
+    const name = physicianInput.value.trim();
+    const npi = document.getElementById(`npi-${orderId}`).value.trim();
+    const phone = document
+      .getElementById(`physician-phone-${orderId}`)
+      .value.trim();
+    const fax = document
+      .getElementById(`physician-fax-${orderId}`)
+      .value.trim();
+
+    const isComplete = name && npi && phone && fax;
+    const saveBtn = document.getElementById(`save-physician-btn-${orderId}`);
+
+    if (isComplete) {
+      badge.textContent = "Ready to Save";
+      badge.className = "section-status-badge ready";
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.style.background = "#2563eb";
+        saveBtn.style.color = "#ffffff";
+        saveBtn.style.cursor = "pointer";
+      }
+    } else {
+      badge.textContent = "Incomplete";
+      badge.className = "section-status-badge incomplete";
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.style.background = "#e5e7eb";
+        saveBtn.style.color = "#9ca3af";
+        saveBtn.style.cursor = "not-allowed";
+      }
+    }
+  }
+
+  function buildNewDoctorForm() {
+    const existing = document.getElementById(`new-doctor-form-${orderId}`);
+    if (existing) existing.remove();
+
+    const content = document
+      .getElementById(`save-physician-btn-${orderId}`)
+      .closest(".accordion-content");
+
+    const saveBtn = document.getElementById(`save-physician-btn-${orderId}`);
+    saveBtn.disabled = true;
+    saveBtn.style.background = "#e5e7eb";
+    saveBtn.style.color = "#9ca3af";
+    saveBtn.style.cursor = "not-allowed";
+
+    const form = document.createElement("div");
+    form.id = `new-doctor-form-${orderId}`;
+    form.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 0.8rem;
+      padding: 1.2rem;
+      background: #f9fafb;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+    `;
+
+    function makeField(labelText, inputId, type = "text", placeholder = "") {
+      const wrapper = document.createElement("div");
+      wrapper.style.cssText =
+        "display:flex; flex-direction:column; gap:0.4rem;";
+
+      const lbl = document.createElement("label");
+      lbl.textContent = labelText;
+      lbl.style.cssText = "font-size:1.1rem; font-weight:600; color:#6b7280;";
+
+      const input = document.createElement("input");
+      input.id = inputId;
+      input.type = type;
+      input.placeholder = placeholder;
+      input.style.cssText = `
+        font-size: 1.3rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: #ffffff;
+      `;
+
+      wrapper.appendChild(lbl);
+      wrapper.appendChild(input);
+      return { wrapper, input };
+    }
+
+    const { wrapper: nameWrapper, input: nameInput } = makeField(
+      "Doctor Name",
+      `new-dr-name-${orderId}`,
+      "text",
+      "Full name",
+    );
+    const { wrapper: npiWrapper, input: npiInput } = makeField(
+      "NPI",
+      `new-dr-npi-${orderId}`,
+      "text",
+      "10-digit NPI",
+    );
+    const { wrapper: addressWrapper, input: addressInput } = makeField(
+      "Office Address",
+      `new-dr-address-${orderId}`,
+      "text",
+      "Full address",
+    );
+    const { wrapper: phoneWrapper, input: phoneInput } = makeField(
+      "Phone",
+      `new-dr-phone-${orderId}`,
+      "tel",
+      "000-000-0000",
+    );
+    const { wrapper: faxWrapper, input: faxInput } = makeField(
+      "Fax",
+      `new-dr-fax-${orderId}`,
+      "tel",
+      "000-000-0000",
+    );
+
+    phoneInput.addEventListener("input", () => formatPhone(phoneInput));
+    faxInput.addEventListener("input", () => formatPhone(faxInput));
+
+    const saveDrBtn = document.createElement("button");
+    saveDrBtn.type = "button";
+    saveDrBtn.textContent = "Save Doctor";
+    saveDrBtn.disabled = true;
+    saveDrBtn.style.cssText = `
+      align-self: flex-start;
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      border: none;
+      background: #e5e7eb;
+      color: #9ca3af;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: not-allowed;
+    `;
+
+    const cancelDrBtn = document.createElement("button");
+    cancelDrBtn.type = "button";
+    cancelDrBtn.textContent = "Cancel";
+    cancelDrBtn.style.cssText = `
+      align-self: flex-start;
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      color: #374151;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+    `;
+
+    const btnRow = document.createElement("div");
+    btnRow.style.cssText = "display:flex; gap:0.6rem; margin-top:0.4rem;";
+    btnRow.appendChild(saveDrBtn);
+    btnRow.appendChild(cancelDrBtn);
+
+    form.appendChild(nameWrapper);
+    form.appendChild(npiWrapper);
+    form.appendChild(addressWrapper);
+    form.appendChild(phoneWrapper);
+    form.appendChild(faxWrapper);
+    form.appendChild(btnRow);
+
+    physicianInput.readOnly = true;
+    physicianInput.style.background = "#f3f4f6";
+    physicianInput.placeholder = "Filling in new doctor...";
+    physicianInput.style.cursor = "not-allowed";
+    physicianInput.style.opacity = "0.6";
+
+    physicianInput.dataset.formOpen = "true";
+
+    const typeaheadField = physicianInput.closest(".accordion-field");
+    content
+      .querySelectorAll(".accordion-field, .accordion-actions")
+      .forEach((el) => {
+        if (el !== typeaheadField) el.style.display = "none";
+      });
+
+    typeaheadField.after(form);
+
+    function updateSaveDrBtn() {
+      const name = nameInput.value.trim();
+      const npi = npiInput.value.trim();
+      const address = addressInput.value.trim();
+      const phone = phoneInput.value.replace(/\D/g, "");
+      const fax = faxInput.value.replace(/\D/g, "");
+
+      const isReady =
+        name.length > 0 &&
+        npi.length > 0 &&
+        address.length > 0 &&
+        phone.length === 10 &&
+        fax.length === 10;
+
+      saveDrBtn.disabled = !isReady;
+      saveDrBtn.style.background = isReady ? "#2563eb" : "#e5e7eb";
+      saveDrBtn.style.color = isReady ? "#ffffff" : "#9ca3af";
+      saveDrBtn.style.cursor = isReady ? "pointer" : "not-allowed";
+    }
+
+    [nameInput, npiInput, addressInput, phoneInput, faxInput].forEach((inp) =>
+      inp.addEventListener("input", updateSaveDrBtn),
+    );
+
+    cancelDrBtn.addEventListener("click", () => {
+      form.remove();
+
+      content
+        .querySelectorAll(".accordion-field, .accordion-actions")
+        .forEach((el) => {
+          el.style.display = "";
+        });
+
+      document.getElementById(`office-field-${orderId}`).style.display = "none";
+
+      physicianInput.readOnly = false;
+      physicianInput.style.background = "#ffffff";
+      physicianInput.placeholder = "Type doctor name...";
+      physicianInput.style.cursor = "";
+      physicianInput.style.opacity = "";
+      physicianInput.value = "";
+      delete physicianInput.dataset.formOpen;
+      checkPhysicianComplete();
+    });
+
+    saveDrBtn.addEventListener("click", () => {
+      const name = nameInput.value.trim();
+      const npi = npiInput.value.trim();
+      const address = addressInput.value.trim();
+      const phone = phoneInput.value.trim();
+      const fax = faxInput.value.trim();
+
+      const summary =
+        `Name: ${name}\n` +
+        `NPI: ${npi}\n` +
+        `Address: ${address}\n` +
+        `Phone: ${phone}\n` +
+        `Fax: ${fax}`;
+
+      showConfirmModal("Add new doctor?", summary, () => {
+        const newDoctor = {
+          id: "dr-new-" + Date.now(),
+          name,
+          npi,
+          offices: [{ label: "Main Office", address, phone, fax }],
+        };
+
+        doctors.push(newDoctor);
+
+        content
+          .querySelectorAll(".accordion-field, .accordion-actions")
+          .forEach((el) => {
+            el.style.display = "";
+          });
+
+        document.getElementById(`office-field-${orderId}`).style.display =
+          "none";
+
+        physicianInput.readOnly = false;
+        physicianInput.style.background = "#ffffff";
+        physicianInput.placeholder = "Type doctor name...";
+        physicianInput.style.cursor = "";
+        physicianInput.style.opacity = "";
+        delete physicianInput.dataset.formOpen;
+        form.remove();
+        selectDoctor(newDoctor);
+      });
+    });
+
+    nameInput.focus();
+  }
+
+  // SAVE / EDIT MODE
+  document
+    .getElementById(`save-physician-btn-${orderId}`)
+    .addEventListener("click", () => {
+      const name = physicianInput.value.trim();
+      const npi = document.getElementById(`npi-${orderId}`).value.trim();
+      const phone = document
+        .getElementById(`physician-phone-${orderId}`)
+        .value.trim();
+      const fax = document
+        .getElementById(`physician-fax-${orderId}`)
+        .value.trim();
+      const isProvisional = name === "Unknown / Will call back";
+
+      const officeSelectEl = document.getElementById(
+        `physician-office-select-${orderId}`,
+      );
+      const officeLabel =
+        officeSelectEl.options[officeSelectEl.selectedIndex]?.text || "";
+
+      const content = document
+        .getElementById(`save-physician-btn-${orderId}`)
+        .closest(".accordion-content");
+
+      content
+        .querySelectorAll(".accordion-field, .accordion-actions")
+        .forEach((el) => {
+          el.style.display = "none";
+        });
+
+      const viewBlock = document.createElement("div");
+      viewBlock.className = "physician-view-mode";
+      viewBlock.id = `physician-view-block-${orderId}`;
+
+      function makeViewField(labelText, valueText) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "physician-view-field";
+
+        const lbl = document.createElement("label");
+        lbl.textContent = labelText;
+
+        const val = document.createElement("span");
+        val.textContent = valueText;
+
+        wrapper.appendChild(lbl);
+        wrapper.appendChild(val);
+        return wrapper;
+      }
+
+      viewBlock.appendChild(makeViewField("Referring Physician", name));
+      if (!isProvisional) {
+        viewBlock.appendChild(makeViewField("NPI", npi));
+        viewBlock.appendChild(makeViewField("Office", officeLabel));
+        viewBlock.appendChild(makeViewField("Phone", phone));
+        viewBlock.appendChild(makeViewField("Fax", fax));
+      }
+
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "Edit";
+      editBtn.className = "edit-button";
+      editBtn.id = `edit-physician-btn-${orderId}`;
+
+      const actionsWrapper = document.createElement("div");
+      actionsWrapper.className = "accordion-actions";
+      const primaryWrapper = document.createElement("div");
+      primaryWrapper.className = "primary-actions";
+      primaryWrapper.appendChild(editBtn);
+      actionsWrapper.appendChild(primaryWrapper);
+
+      viewBlock.appendChild(actionsWrapper);
+      content.appendChild(viewBlock);
+
+      const badge = document.getElementById(`badge-physician-${orderId}`);
+      badge.textContent = isProvisional ? "Provisional" : "Complete";
+      badge.className = isProvisional
+        ? "section-status-badge provisional"
+        : "section-status-badge complete";
+
+      editBtn.addEventListener("click", () => {
+        viewBlock.remove();
+
+        content
+          .querySelectorAll(".accordion-field, .accordion-actions")
+          .forEach((el) => {
+            el.style.display = "";
+          });
+
+        if (selectedDoctor) {
+          document.getElementById(`office-field-${orderId}`).style.display =
+            "block";
+        }
+
+        const badge = document.getElementById(`badge-physician-${orderId}`);
+        badge.textContent = "Ready to Save";
+        badge.className = "section-status-badge ready";
+      });
+
+      updateOrderHeader();
+      updateScheduleAppointmentBtn();
+    });
+
+  checkPhysicianComplete();
+}
+
+function initOrderHeader(orderId) {
+  const header = document.getElementById(`order-header-${orderId}`);
+  header.addEventListener("click", () => {
+    const accordion = document.getElementById(`order-accordion-${orderId}`);
+    accordion.classList.toggle("open");
+  });
+}
